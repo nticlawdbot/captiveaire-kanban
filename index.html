@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaptiveAire Kanban Board</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .sync-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .sync-btn:hover {
+            background: #5568d3;
+        }
+
+        .sync-btn.syncing {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .column {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 80vh;
+        }
+
+        .column-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .column-count {
+            display: inline-block;
+            background: rgba(255,255,255,0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+            font-size: 12px;
+        }
+
+        .cards-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            min-height: 400px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: grab;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .card:hover {
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .card-company {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .card-location {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .card-details {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .card-job {
+            display: inline-block;
+            background: #e8ecf1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            color: #444;
+            margin-bottom: 8px;
+        }
+
+        .card-controls {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .assign-dropdown {
+            flex: 1;
+            padding: 4px 6px;
+            font-size: 11px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .card-delete {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .card-delete:hover {
+            background: #ff5252;
+        }
+
+        .no-cards {
+            color: #999;
+            text-align: center;
+            padding: 30px 10px;
+            font-size: 13px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background: #e8ecf1;
+            color: #333;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover {
+            background: #d8e0e8;
+        }
+
+        .footer {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>🎯 CaptiveAire Kanban Board</h1>
+                <p style="color: #666; margin-top: 5px; font-size: 13px;">Sales Pipeline · Project Execution · Operations</p>
+            </div>
+            <div class="header-controls">
+                <div class="status">
+                    Last sync: <span id="last-sync">Never</span>
+                </div>
+                <button class="sync-btn" id="sync-btn">🔄 Sync Smartsheet</button>
+            </div>
+        </div>
+
+        <div class="board" id="board"></div>
+
+        <div class="footer">
+            <p>📊 Drag cards to move between columns • Assign to team members • On-demand Smartsheet sync</p>
+        </div>
+    </div>
+
+    <!-- Add Card Modal -->
+    <div class="modal" id="addCardModal">
+        <div class="modal-content">
+            <h2>Add New Task</h2>
+            <div class="form-group">
+                <label>Column</label>
+                <select id="newCardColumn">
+                    <option value="">Select column...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Company / Title</label>
+                <input type="text" id="newCardCompany" placeholder="e.g., Emmy Squared Pizza">
+            </div>
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="newCardLocation" placeholder="e.g., New York, NY">
+            </div>
+            <div class="form-group">
+                <label>Job #</label>
+                <input type="text" id="newCardJob" placeholder="e.g., JOB-12345">
+            </div>
+            <div class="form-group">
+                <label>Assigned To</label>
+                <select id="newCardAssignee">
+                    <option value="">Unassigned</option>
+                    <option value="Mike">Mike</option>
+                    <option value="Joe">Joe</option>
+                    <option value="Dan">Dan</option>
+                    <option value="Austin">Austin</option>
+                </select>
+            </div>
+            <div class="form-buttons">
+                <button class="btn-primary" id="saveCardBtn">Add Card</button>
+                <button class="btn-cancel" onclick="closeAddCardModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const COLUMNS = {
+            'backlog': '📋 Backlog',
+            'qualified': '🟢 Qualified Leads',
+            'proposed': '💼 Proposed',
+            'won': '🎉 Won',
+            'pre-kickoff': '🔧 Pre-Kickoff',
+            'in-progress': '⚙️ In Progress',
+            'awaiting': '⏳ Awaiting Client',
+            'complete': '✅ Complete',
+            'todo': '📌 To Do',
+            'blocked': '🚫 Blocked',
+            'done': '✓ Done'
+        };
+
+        const ASSIGNEES = ['Mike', 'Joe', 'Dan', 'Austin'];
+        
+        let cards = JSON.parse(localStorage.getItem('kanbanCards')) || initializeDefaultCards();
+        let draggedCard = null;
+
+        function initializeDefaultCards() {
+            return {
+                'backlog': [],
+                'qualified': [
+                    {
+                        id: 'card-1',
+                        company: 'Emmy Squared Pizza',
+                        location: 'Boston, MA',
+                        job: 'JOB-001',
+                        assignee: 'Dan',
+                        notes: 'Boston Back Bay - Opens Feb 27'
+                    },
+                    {
+                        id: 'card-2',
+                        company: 'Rush Bowls',
+                        location: 'National',
+                        job: 'JOB-002',
+                        assignee: 'Austin',
+                        notes: '100+ units in pipeline'
+                    }
+                ],
+                'proposed': [
+                    {
+                        id: 'card-3',
+                        company: 'Casa',
+                        location: 'Prairie Village, KS',
+                        job: 'JOB-003',
+                        assignee: 'Dan',
+                        notes: 'Opening Feb 2026'
+                    }
+                ],
+                'won': [],
+                'pre-kickoff': [],
+                'in-progress': [
+                    {
+                        id: 'card-4',
+                        company: 'Freddy\'s',
+                        location: 'Fort Gregg Adams, VA',
+                        job: 'JOB-8169283',
+                        assignee: 'Mike',
+                        notes: 'Site Contact: Nick Yung'
+                    }
+                ],
+                'awaiting': [],
+                'complete': [],
+                'todo': [],
+                'blocked': [],
+                'done': []
+            };
+        }
+
+        function saveCards() {
+            localStorage.setItem('kanbanCards', JSON.stringify(cards));
+        }
+
+        function renderBoard() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+
+            Object.entries(COLUMNS).forEach(([key, label]) => {
+                const column = document.createElement('div');
+                column.className = 'column';
+                column.dataset.column = key;
+
+                const header = document.createElement('div');
+                header.className = 'column-header';
+                header.innerHTML = `${label} <span class="column-count">${cards[key]?.length || 0}</span>`;
+
+                const container = document.createElement('div');
+                container.className = 'cards-container';
+                container.dataset.column = key;
+                container.ondrop = handleDrop;
+                container.ondragover = (e) => e.preventDefault();
+                container.ondragleave = (e) => e.target === container && container.style.background === '';
+
+                const cardList = cards[key] || [];
+                if (cardList.length === 0) {
+                    container.innerHTML = '<div class="no-cards">No tasks</div>';
+                } else {
+                    cardList.forEach(card => {
+                        const cardEl = createCardElement(card, key);
+                        container.appendChild(cardEl);
+                    });
+                }
+
+                column.appendChild(header);
+                column.appendChild(container);
+                board.appendChild(column);
+            });
+        }
+
+        function createCardElement(card, columnKey) {
+            const cardEl = document.createElement('div');
+            cardEl.className = 'card';
+            cardEl.draggable = true;
+            cardEl.dataset.cardId = card.id;
+            cardEl.dataset.column = columnKey;
+
+            cardEl.ondragstart = (e) => {
+                draggedCard = { card, fromColumn: columnKey };
+                cardEl.classList.add('dragging');
+            };
+
+            cardEl.ondragend = () => cardEl.classList.remove('dragging');
+
+            cardEl.innerHTML = `
+                <div class="card-company">${card.company}</div>
+                <div class="card-location">${card.location}</div>
+                ${card.job ? `<div class="card-job">Job #${card.job}</div>` : ''}
+                ${card.notes ? `<div class="card-details">${card.notes}</div>` : ''}
+                <div class="card-controls">
+                    <select class="assign-dropdown" onchange="reassignCard('${card.id}', '${columnKey}', this.value)">
+                        <option value="">Unassigned</option>
+                        ${ASSIGNEES.map(a => `<option value="${a}" ${card.assignee === a ? 'selected' : ''}>${a}</option>`).join('')}
+                    </select>
+                    <button class="card-delete" onclick="deleteCard('${card.id}', '${columnKey}')">Delete</button>
+                </div>
+                ${card.assignee ? `<div style="margin-top: 8px; font-size: 11px; color: #667eea; font-weight: 600;">👤 ${card.assignee}</div>` : ''}
+            `;
+
+            return cardEl;
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            if (!draggedCard) return;
+
+            const toColumn = e.currentTarget.dataset.column;
+            const { card, fromColumn } = draggedCard;
+
+            if (fromColumn !== toColumn) {
+                cards[fromColumn] = cards[fromColumn].filter(c => c.id !== card.id);
+                cards[toColumn].push(card);
+                saveCards();
+            }
+
+            draggedCard = null;
+            renderBoard();
+        }
+
+        function reassignCard(cardId, columnKey, assignee) {
+            const card = cards[columnKey].find(c => c.id === cardId);
+            if (card) {
+                card.assignee = assignee || null;
+                saveCards();
+                renderBoard();
+            }
+        }
+
+        function deleteCard(cardId, columnKey) {
+            cards[columnKey] = cards[columnKey].filter(c => c.id !== cardId);
+            saveCards();
+            renderBoard();
+        }
+
+        function syncSmartsheet() {
+            const btn = document.getElementById('sync-btn');
+            btn.classList.add('syncing');
+            btn.disabled = true;
+            btn.textContent = '⏳ Syncing...';
+
+            // Simulate sync (would call Smartsheet API here)
+            setTimeout(() => {
+                // In production, fetch from Smartsheet API and merge data
+                const now = new Date().toLocaleTimeString();
+                document.getElementById('last-sync').textContent = now;
+                
+                btn.classList.remove('syncing');
+                btn.disabled = false;
+                btn.textContent = '🔄 Sync Smartsheet';
+                
+                alert('✓ Smartsheet sync complete!\n\nIn production, this will pull live data from your Smartsheet.');
+            }, 2000);
+        }
+
+        function openAddCardModal() {
+            const modal = document.getElementById('addCardModal');
+            const select = document.getElementById('newCardColumn');
+            select.innerHTML = '<option value="">Select column...</option>' + 
+                Object.entries(COLUMNS).map(([key, label]) => `<option value="${key}">${label}</option>`).join('');
+            modal.classList.add('active');
+        }
+
+        function closeAddCardModal() {
+            document.getElementById('addCardModal').classList.remove('active');
+        }
+
+        document.getElementById('sync-btn').onclick = syncSmartsheet;
+
+        document.getElementById('saveCardBtn').onclick = () => {
+            const columnKey = document.getElementById('newCardColumn').value;
+            const company = document.getElementById('newCardCompany').value;
+            const location = document.getElementById('newCardLocation').value;
+            const job = document.getElementById('newCardJob').value;
+            const assignee = document.getElementById('newCardAssignee').value;
+
+            if (!columnKey || !company) {
+                alert('Please fill in column and company');
+                return;
+            }
+
+            const newCard = {
+                id: `card-${Date.now()}`,
+                company,
+                location,
+                job,
+                assignee: assignee || null,
+                notes: ''
+            };
+
+            cards[columnKey].push(newCard);
+            saveCards();
+            renderBoard();
+            closeAddCardModal();
+
+            // Clear form
+            document.getElementById('newCardCompany').value = '';
+            document.getElementById('newCardLocation').value = '';
+            document.getElementById('newCardJob').value = '';
+            document.getElementById('newCardAssignee').value = '';
+        };
+
+        // Initial render
+        renderBoard();
+    </script>
+</body>
+</html>
