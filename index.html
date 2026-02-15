@@ -43,6 +43,25 @@
             display: flex;
             gap: 15px;
             align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            background: #999;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-link:hover {
+            background: #777;
         }
 
         .sync-btn {
@@ -311,6 +330,7 @@
                 <div class="status">
                     Last sync: <span id="last-sync">Never</span>
                 </div>
+                <a href="leads.html" class="nav-link">📊 Go to Leads</a>
                 <button class="sync-btn" id="sync-btn">🔄 Sync Smartsheet</button>
             </div>
         </div>
