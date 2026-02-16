@@ -331,6 +331,7 @@
                     Last sync: <span id="last-sync">Never</span>
                 </div>
                 <button class="sync-btn" id="add-project-btn" onclick="openAddCardModal()">➕ Add Project</button>
+                <a href="leads.html" class="nav-link">📊 Go to Leads</a>
                 <button class="sync-btn" id="sync-btn">🔄 Sync Smartsheet</button>
             </div>
         </div>
@@ -384,16 +385,10 @@
     <script>
         const COLUMNS = {
             'backlog': '📋 Backlog',
-            'qualified': '🟢 Qualified',
-            'proposed': '💼 Proposed',
-            'won': '🎉 Won',
             'pre-kickoff': '🔧 Pre-Kickoff',
             'in-progress': '⚙️ In Progress',
             'awaiting': '⏳ Awaiting Client',
-            'complete': '✅ Complete',
-            'todo': '📌 To Do',
-            'blocked': '🚫 Blocked',
-            'done': '✓ Done'
+            'complete': '✅ Complete'
         };
 
         const ASSIGNEES = ['Mike', 'Joe', 'Dan', 'Austin'];
@@ -404,39 +399,27 @@
         function initializeDefaultCards() {
             return {
                 'backlog': [],
-                'qualified': [
+                'pre-kickoff': [
                     {
                         id: 'card-1',
                         company: 'Emmy Squared Pizza',
                         location: 'Boston, MA',
                         job: 'JOB-001',
                         assignee: 'Dan',
-                        notes: 'Boston Back Bay - Opens Feb 27'
+                        notes: 'Setup phase - Opens Feb 27'
                     },
                     {
                         id: 'card-2',
-                        company: 'Rush Bowls',
-                        location: 'National',
-                        job: 'JOB-002',
-                        assignee: 'Austin',
-                        notes: '100+ units in pipeline'
-                    }
-                ],
-                'proposed': [
-                    {
-                        id: 'card-3',
                         company: 'Casa',
                         location: 'Prairie Village, KS',
                         job: 'JOB-003',
                         assignee: 'Dan',
-                        notes: 'Opening Feb 2026'
+                        notes: 'Design phase - Opening Feb 2026'
                     }
                 ],
-                'won': [],
-                'pre-kickoff': [],
                 'in-progress': [
                     {
-                        id: 'card-4',
+                        id: 'card-3',
                         company: 'Freddy\'s',
                         location: 'Fort Gregg Adams, VA',
                         job: 'JOB-8169283',
@@ -445,10 +428,7 @@
                     }
                 ],
                 'awaiting': [],
-                'complete': [],
-                'todo': [],
-                'blocked': [],
-                'done': []
+                'complete': []
             };
         }
 
