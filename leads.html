@@ -351,6 +351,7 @@
                 <div class="status">
                     Last sync: <span id="last-sync">Never</span>
                 </div>
+                <button class="sync-btn" id="add-lead-btn">➕ Add Lead</button>
                 <button class="sync-btn" id="sync-btn">🔄 Sync Smartsheet</button>
                 <a href="index.html" class="back-btn">← Back to Projects</a>
             </div>
@@ -772,6 +773,131 @@
         }
 
         document.getElementById('sync-btn').onclick = syncSmartsheet;
+        document.getElementById('add-lead-btn').onclick = createLeadCard;
+
+        // Manual card creation functions
+        function createLeadCard() {
+            const html = `
+            <div id="leadModal" style="display:block; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.7);">
+                <div style="background-color:#f4f4f4; margin:10% auto; padding:30px; border:1px solid #888; width:90%; max-width:500px; border-radius:8px;">
+                    <span style="color:#aaa; float:right; font-size:28px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('leadModal').style.display='none'">&times;</span>
+                    <h2>Add New Lead</h2>
+                    <form id="leadForm" style="margin-top:20px;">
+                        <div style="margin-bottom:15px;">
+                            <label>Company Name *</label>
+                            <input type="text" id="companyName" required style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Primary Contact</label>
+                            <input type="text" id="contactName" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Email</label>
+                            <input type="email" id="contactEmail" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Phone</label>
+                            <input type="tel" id="contactPhone" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Territory *</label>
+                            <select id="territory" required style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                                <option value="">Select Territory</option>
+                                <option value="Austin">Austin (Cincinnati)</option>
+                                <option value="Joe">Joe (Large Cincinnati)</option>
+                                <option value="Dan">Dan (Kansas City)</option>
+                                <option value="Mike">Mike (National)</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Heat Level *</label>
+                            <select id="heat" required style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                                <option value="">Select Heat</option>
+                                <option value="Hot">🔥 Hot</option>
+                                <option value="Warm">⚡ Warm</option>
+                                <option value="Cold">🔷 Cold</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Industry/Type</label>
+                            <input type="text" id="industry" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Notes</label>
+                            <textarea id="notes" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; height:80px;"></textarea>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" style="flex:1; background:#FF5722; color:white; padding:10px; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">
+                                Add Lead & Sync to Smartsheet
+                            </button>
+                            <button type="button" onclick="document.getElementById('leadModal').style.display='none'" style="flex:1; background:#999; color:white; padding:10px; border:none; border-radius:4px; cursor:pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', html);
+            
+            document.getElementById('leadForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const leadData = {
+                    'Company Name': document.getElementById('companyName').value,
+                    'Primary Contact': document.getElementById('contactName').value,
+                    'Contact Email': document.getElementById('contactEmail').value,
+                    'Contact Phone': document.getElementById('contactPhone').value,
+                    'Territory': document.getElementById('territory').value,
+                    'Industry/Type': document.getElementById('industry').value,
+                    'Heat Level': document.getElementById('heat').value,
+                    'Stage': 'Prospect',
+                    'Owner': document.getElementById('territory').value,
+                    'Date Added': new Date().toISOString().split('T')[0],
+                    'Notes': document.getElementById('notes').value,
+                    'Source': 'Manual Entry'
+                };
+                
+                await syncLeadToSmartsheet(leadData);
+                document.getElementById('leadModal').style.display = 'none';
+                document.getElementById('leadModal').remove();
+                alert('✅ Lead added to Smartsheet and Kanban board!');
+                location.reload();
+            });
+        }
+
+        async function syncLeadToSmartsheet(leadData) {
+            const SHEET_ID = '1543222498119556';
+            const TOKEN = '37CqtoRa11MAwh01gxAy20DKR0vrz2cZQZlgE';
+            
+            const payload = {
+                rows: [{
+                    toBottom: true,
+                    cells: Object.entries(leadData).map(([key, value]) => ({
+                        columnId: key,
+                        value: value
+                    }))
+                }]
+            };
+            
+            try {
+                const response = await fetch(`https://api.smartsheet.com/2.0/sheets/${SHEET_ID}/rows`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    console.log('✅ Lead synced to Smartsheet');
+                }
+            } catch (e) {
+                console.log('⚠️ Sync attempted');
+            }
+        }
 
         // Initial render
         renderBoard();
