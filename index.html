@@ -392,8 +392,6 @@
         };
 
         const ASSIGNEES = ['Mike', 'Joe', 'Dan', 'Austin'];
-        const GOOGLE_SHEET_ID = '1SrK8xJEL_FwtnJqRGHo_UQZm1-26Do2ITdKXkR0LSQI';
-        const GOOGLE_API_KEY = 'AIzaSyB5sTZn5cKkY_UkLAKzx2nWajRd5hGpFZE';
 
         // Status to Kanban column mapping
         const STATUS_MAP = {
@@ -556,55 +554,51 @@
             renderBoard();
         }
 
-        async function fetchGoogleSheetProjects() {
+        async function fetchProjectsJSON() {
             try {
-                const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/Sheet1?key=${GOOGLE_API_KEY}`);
+                // Fetch projects.json from GitHub
+                const response = await fetch('https://raw.githubusercontent.com/nticlawdbot/captiveaire-kanban/main/projects.json');
                 
                 if (!response.ok) {
-                    console.error('Google Sheets API error:', response.status);
+                    console.error('Projects JSON fetch error:', response.status);
                     return [];
                 }
                 
                 const data = await response.json();
-                const rows = data.values || [];
                 const projects = [];
                 
-                // Skip header row (index 0), parse data rows
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i];
-                    if (!row || row.length < 3) continue; // Skip empty rows
-                    
-                    const company = row[0] || '';
-                    const location = row[1] || 'Unknown';
-                    const job = row[2] || '';
-                    const status = row[3] || 'Backlog';
-                    const owner = row[5] || null;
+                // Parse projects from JSON
+                data.projects.forEach((project, idx) => {
+                    const company = project.company || '';
+                    const location = project.location || 'Unknown';
+                    const job = project.job || '';
+                    const status = project.status || 'Backlog';
                     
                     if (company && job) {
                         const columnKey = STATUS_MAP[status] || 'backlog';
                         
                         projects.push({
-                            id: `gs-${i}`,
+                            id: `json-${idx}`,
                             company,
                             location,
                             job: String(job).trim(),
                             status,
-                            assignee: owner || null,
+                            assignee: null,
                             notes: `Status: ${status}`
                         });
                     }
-                }
+                });
                 
-                console.log(`✅ Loaded ${projects.length} projects from Google Sheet`);
+                console.log(`✅ Loaded ${projects.length} projects from projects.json`);
                 return projects;
             } catch (error) {
-                console.error('Google Sheets fetch error:', error);
+                console.error('Projects JSON fetch error:', error);
                 return [];
             }
         }
 
-        async function loadGoogleSheetData() {
-            const projects = await fetchGoogleSheetProjects();
+        async function loadProjectsData() {
+            const projects = await fetchProjectsJSON();
             
             // Merge Smartsheet projects into cards by column
             projects.forEach(project => {
@@ -627,8 +621,8 @@
             btn.disabled = true;
             btn.textContent = '⏳ Syncing...';
 
-            // Fetch and load real data from Google Sheet
-            await loadGoogleSheetData();
+            // Fetch and load real data from projects.json
+            await loadProjectsData();
             
             const now = new Date().toLocaleTimeString();
             document.getElementById('last-sync').textContent = now;
@@ -695,10 +689,10 @@
             console.log(`✅ Project added to local kanban: ${company} (Job ${job})`);
         }
 
-        // Load Google Sheet data on page init
+        // Load projects.json on page init
         (async () => {
-            // Try to load from Google Sheet, then render
-            const projects = await fetchGoogleSheetProjects();
+            // Try to load from projects.json, then render
+            const projects = await fetchProjectsJSON();
             if (projects.length > 0) {
                 // Merge Smartsheet projects into localStorage
                 projects.forEach(project => {
