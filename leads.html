@@ -460,7 +460,15 @@
         const TERRITORIES = ['Kansas City, MO', 'Cincinnati, OH', 'National', 'Other'];
         const OWNERS = ['Mike', 'Joe', 'Dan', 'Austin'];
 
-        let allLeads = JSON.parse(localStorage.getItem('allLeads')) || [];
+        // Check if localStorage has old data (Dos Hermanos = old sample data)
+        let storedLeads = JSON.parse(localStorage.getItem('allLeads')) || [];
+        if (storedLeads.length > 0 && storedLeads[0].company === 'Dos Hermanos') {
+            // Old data detected - clear it
+            localStorage.removeItem('allLeads');
+            storedLeads = [];
+        }
+        
+        let allLeads = storedLeads;
 
         // Load sample data if empty
         if (allLeads.length === 0) {
