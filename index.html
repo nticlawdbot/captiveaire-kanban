@@ -640,13 +640,35 @@
             const SHEET_ID = '3675420223295364';
             const TOKEN = '37CqtoRa11MAwh01gxAy20DKR0vrz2cZQZlgE';
             
+            // Correct column ID mappings for Projects sheet
+            const COLUMN_MAP = {
+                "Company Name": 5637177097277316,
+                "Company": 5637177097277316,
+                "Location": 3385377283592068,
+                "Job Number": 7888976910962564,
+                "Site Contact Name": 7044551980830596,
+                "Site Contact Phone": 1415052446617476,
+                "Site Contact Email": 5918652073987972,
+                "Status": 7326026957541252,
+                "Owner": 954079747198852,
+                "Turnover Date": 4983949689810820,
+                "Notes": 5358104129722244
+            };
+            
+            const cells = [];
+            for (const [fieldName, value] of Object.entries(projectData)) {
+                if (COLUMN_MAP[fieldName]) {
+                    cells.push({
+                        columnId: COLUMN_MAP[fieldName],
+                        value: String(value)
+                    });
+                }
+            }
+            
             const payload = {
                 rows: [{
                     toBottom: true,
-                    cells: Object.entries(projectData).map(([key, value]) => ({
-                        columnId: key,
-                        value: value
-                    }))
+                    cells: cells
                 }]
             };
             

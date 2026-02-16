@@ -871,13 +871,37 @@
             const SHEET_ID = '1543222498119556';
             const TOKEN = '37CqtoRa11MAwh01gxAy20DKR0vrz2cZQZlgE';
             
+            // Correct column ID mappings for Leads sheet
+            const COLUMN_MAP = {
+                "Company Name": 8011853475827588,
+                "Primary Contact": 693504081350532,
+                "Contact Email": 5197103708721028,
+                "Contact Phone": 2945303895035780,
+                "Territory": 639666129424260,
+                "Industry/Type": 1459049789607812,
+                "Heat Level": 6284559363297156,
+                "Stage": 4434665610628996,
+                "Next Steps": 6149316211855236,
+                "Owner": 954079747198852,
+                "Date Added": 2854504502452996,
+                "Notes": 5358104129722244,
+                "Source": 7662703756992388
+            };
+            
+            const cells = [];
+            for (const [fieldName, value] of Object.entries(leadData)) {
+                if (COLUMN_MAP[fieldName]) {
+                    cells.push({
+                        columnId: COLUMN_MAP[fieldName],
+                        value: String(value)
+                    });
+                }
+            }
+            
             const payload = {
                 rows: [{
                     toBottom: true,
-                    cells: Object.entries(leadData).map(([key, value]) => ({
-                        columnId: key,
-                        value: value
-                    }))
+                    cells: cells
                 }]
             };
             
