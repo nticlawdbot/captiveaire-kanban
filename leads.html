@@ -868,24 +868,24 @@
         }
 
         async function syncLeadToSmartsheet(leadData) {
-            const SHEET_ID = '1543222498119556';
+            const SHEET_ID = '3616288321523588';  // NEW V2 Writable Sheet
             const TOKEN = '37CqtoRa11MAwh01gxAy20DKR0vrz2cZQZlgE';
             
-            // Correct column ID mappings for Leads sheet
+            // Column ID mappings for NEW Leads V2 sheet (writable)
             const COLUMN_MAP = {
-                "Company Name": 8011853475827588,
-                "Primary Contact": 693504081350532,
-                "Contact Email": 5197103708721028,
-                "Contact Phone": 2945303895035780,
-                "Territory": 639666129424260,
-                "Industry/Type": 1459049789607812,
-                "Heat Level": 6284559363297156,
-                "Stage": 4434665610628996,
-                "Next Steps": 6149316211855236,
-                "Owner": 954079747198852,
-                "Date Added": 2854504502452996,
-                "Notes": 5358104129722244,
-                "Source": 7662703756992388
+                "Company Name": 4447266709131140,
+                "Primary Contact": 8950866336501636,
+                "Contact Email": 49220198027140,
+                "Contact Phone": 4552819825397636,
+                "Territory": 2301020011712388,
+                "Industry/Type": 6804619639082884,
+                "Heat Level": 1175120104869764,
+                "Stage": 5678719732240260,
+                "Next Steps": 3426919918555012,
+                "Owner": 7930519545925508,
+                "Date Added": 612170151448452,
+                "Notes": 5115769778818948,
+                "Source": 2863969965133700
             };
             
             const cells = [];
