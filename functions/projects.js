@@ -29,10 +29,80 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type'
       }
     };
+  }
+
+  // Handle PUT (update existing project in Smartsheet)
+  if (event.httpMethod === 'PUT') {
+    try {
+      const data = JSON.parse(event.body);
+      const { rowId, company, location, status, turnoverDate, siteContact, siteContactPhone, siteContactEmail, fireFinal, sdv, fireSystemService, hoodShipDate, fsNumber } = data;
+
+      if (!rowId) {
+        return {
+          statusCode: 400,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Missing rowId' })
+        };
+      }
+
+      // Build cells array with only fields that have values
+      const cells = [];
+      if (company !== undefined && company !== null) cells.push({ columnId: COLS.Company, value: company });
+      if (location !== undefined && location !== null) cells.push({ columnId: COLS.Location, value: location });
+      if (status !== undefined && status !== null) cells.push({ columnId: COLS.Status, value: status });
+      if (turnoverDate !== undefined && turnoverDate !== null) cells.push({ columnId: COLS['Turnover Date'], value: turnoverDate });
+      if (siteContact !== undefined && siteContact !== null) cells.push({ columnId: COLS['Site Contact'], value: siteContact });
+      if (siteContactPhone !== undefined && siteContactPhone !== null) cells.push({ columnId: COLS['Site Contact #'], value: siteContactPhone });
+      if (siteContactEmail !== undefined && siteContactEmail !== null) cells.push({ columnId: COLS['Site Contact Email'], value: siteContactEmail });
+      if (fireFinal !== undefined) cells.push({ columnId: COLS['Fire Final'], value: fireFinal });
+      if (sdv !== undefined) cells.push({ columnId: COLS.SDV, value: sdv });
+      if (fireSystemService !== undefined) cells.push({ columnId: COLS['Fire System Service'], value: fireSystemService });
+      if (hoodShipDate !== undefined && hoodShipDate !== null) cells.push({ columnId: COLS['Hood Ship Date'], value: hoodShipDate });
+      if (fsNumber !== undefined && fsNumber !== null) cells.push({ columnId: COLS['FS #'], value: fsNumber });
+
+      const updatePayload = { cells };
+
+      const updateResponse = await fetch(
+        `https://api.smartsheet.com/2.0/sheets/${SMARTSHEET_ID}/rows/${rowId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${SMARTSHEET_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatePayload)
+        }
+      );
+
+      const updateData = await updateResponse.json();
+      if (!updateResponse.ok) {
+        console.error('Smartsheet PUT error:', updateData);
+        return {
+          statusCode: updateResponse.status,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Failed to update row', details: updateData })
+        };
+      }
+
+      console.log(`✅ Project updated in Smartsheet: Row ${rowId}`);
+
+      return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ success: true, message: 'Project updated successfully', rowId })
+      };
+    } catch (error) {
+      console.error('PUT error:', error);
+      return {
+        statusCode: 500,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: error.message })
+      };
+    }
   }
 
   // Handle POST (add project with two-step API call: POST to create, PUT to populate)

@@ -629,27 +629,90 @@
             const { card, fromColumn } = draggedCard;
 
             if (fromColumn !== toColumn) {
+                // Map column key to status
+                const COLUMN_TO_STATUS = {
+                    'backlog': 'Backlog',
+                    'intro-email': 'Need to Contact',
+                    'stalled': 'Stalled',
+                    'week-4': 'Rough In',
+                    'week-3': 'Equipment Shipped',
+                    'week-2': 'SDV',
+                    'week-1': 'Fire Final',
+                    'completed': 'Completed'
+                };
+
+                const newStatus = COLUMN_TO_STATUS[toColumn] || 'Backlog';
+                card.status = newStatus;
+
                 cards[fromColumn] = cards[fromColumn].filter(c => c.id !== card.id);
                 cards[toColumn].push(card);
                 saveCards();
+
+                // Sync to Smartsheet if this is a Smartsheet row
+                if (card.id.startsWith('ss-')) {
+                    const rowId = card.id.replace('ss-', '');
+                    updateProjectStatusInSmartsheet(rowId, newStatus);
+                }
             }
 
             draggedCard = null;
             renderBoard();
         }
 
-        function reassignCard(cardId, columnKey, assignee) {
+        async function updateProjectStatusInSmartsheet(rowId, newStatus) {
+            try {
+                const response = await fetch('/.netlify/functions/projects', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        rowId,
+                        status: newStatus
+                    })
+                });
+
+                if (response.ok) {
+                    console.log(`✅ Status updated in Smartsheet: ${newStatus}`);
+                    return true;
+                } else {
+                    console.error('Failed to update status in Smartsheet:', response.status);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Status update error:', error);
+                return false;
+            }
+        }
+
+        async function reassignCard(cardId, columnKey, assignee) {
             const card = cards[columnKey].find(c => c.id === cardId);
             if (card) {
                 card.owner = assignee || null;
                 saveCards();
+
+                // Sync to Smartsheet if this is a Smartsheet row
+                if (cardId.startsWith('ss-')) {
+                    const rowId = cardId.replace('ss-', '');
+                    // Note: Coordinator is a CONTACT column type in Smartsheet and can't be set via API
+                    // Users can assign manually in Smartsheet if needed, but we don't sync owner field
+                    console.log(`📝 Owner updated locally: ${assignee || 'Unassigned'}`);
+                }
+
                 renderBoard();
             }
         }
 
-        function deleteCard(cardId, columnKey) {
+        async function deleteCard(cardId, columnKey) {
+            if (!confirm('Are you sure you want to delete this project?')) return;
+            
             cards[columnKey] = cards[columnKey].filter(c => c.id !== cardId);
             saveCards();
+
+            // Note: Smartsheet rows should be archived/deleted in Smartsheet itself, not via kanban
+            // For now, we only delete from kanban local storage
+            if (cardId.startsWith('ss-')) {
+                console.log('⚠️ Project deleted from kanban. To delete from Smartsheet, archive/delete the row in Smartsheet directly.');
+            }
+
             renderBoard();
         }
 
@@ -926,11 +989,61 @@
                 }
 
                 saveCards();
+
+                // Sync to Smartsheet if this is a Smartsheet row (id starts with 'ss-')
+                if (currentEditCardId.startsWith('ss-')) {
+                    const rowId = currentEditCardId.replace('ss-', '');
+                    const syncSuccess = await updateProjectInSmartsheet(rowId, company, location, status, turnoverDate, siteContact, siteContactPhone, siteContactEmail, fireFinal, sdv, fireSystemService, hoodShipDate, fsNumber);
+                    
+                    if (syncSuccess) {
+                        console.log(`✅ Project updated in Smartsheet: ${company}`);
+                    } else {
+                        console.error('⚠️ Failed to sync to Smartsheet, but local changes saved');
+                    }
+                }
+
                 renderBoard();
                 closeEditCardModal();
                 alert('✅ Project updated!');
             }
         };
+
+        async function updateProjectInSmartsheet(rowId, company, location, status, turnoverDate, siteContact, siteContactPhone, siteContactEmail, fireFinal, sdv, fireSystemService, hoodShipDate, fsNumber) {
+            try {
+                const response = await fetch('/.netlify/functions/projects', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        rowId,
+                        company,
+                        location,
+                        status,
+                        turnoverDate: turnoverDate || null,
+                        siteContact: siteContact || null,
+                        siteContactPhone: siteContactPhone || null,
+                        siteContactEmail: siteContactEmail || null,
+                        fireFinal,
+                        sdv,
+                        fireSystemService,
+                        hoodShipDate: hoodShipDate || null,
+                        fsNumber: fsNumber || null
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log(`✅ Smartsheet sync successful for row ${rowId}`);
+                    return true;
+                } else {
+                    const error = await response.json();
+                    console.error('Smartsheet sync error:', response.status, error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Smartsheet update error:', error);
+                return false;
+            }
+        }
 
         function updateCheckbox(cardId, columnKey, checkboxType, isChecked) {
             const card = cards[columnKey].find(c => c.id === cardId);
