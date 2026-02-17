@@ -9,9 +9,20 @@ const COLS = {
   Company: 8377424631097220,
   Location: 1059075236620164,
   'Job Number': 5562674863990660,
+  'NTi Hood Install': 1821797590454148,
+  'NTi TAB': 7085205822852996,
   Status: 7474414543130500,
   'Turnover Date': 3117391865505668,
-  Owner: 3530585123645316
+  'Fire Final': 3360332395636612,
+  'SDV': 5519380670533508,
+  'TAB': 4157645235480452,
+  'Hood Ship Date': 8197477746036612,
+  'Site Contact': 669709439920004,
+  'Site Contact #': 5173309067290500,
+  'Site Contact Email': 2921509253605252,
+  'Fire System Service': 8557701821058948,
+  'FS #': 8449242890981252,
+  Owner: 954079747198852
 };
 
 exports.handler = async (event, context) => {
@@ -116,26 +127,28 @@ exports.handler = async (event, context) => {
 
     // Parse rows and extract project data
     data.rows.forEach(row => {
-      let company, location, job, status, owner;
+      const project = { id: `ss-${row.id}` };
 
       row.cells.forEach(cell => {
-        if (cell.columnId === COLS.Company) company = cell.value;
-        if (cell.columnId === COLS.Location) location = cell.value;
-        if (cell.columnId === COLS['Job Number']) job = cell.value;
-        if (cell.columnId === COLS.Status) status = cell.value;
-        if (cell.columnId === COLS.Owner) owner = cell.value;
+        if (cell.columnId === COLS.Company) project.company = String(cell.value || '');
+        if (cell.columnId === COLS.Location) project.location = String(cell.value || 'Unknown');
+        if (cell.columnId === COLS['Job Number']) project.job = String(Math.floor(cell.value || 0));
+        if (cell.columnId === COLS.Status) project.status = String(cell.value || 'Backlog');
+        if (cell.columnId === COLS.Owner) project.owner = cell.value ? String(cell.value) : null;
+        if (cell.columnId === COLS['Turnover Date']) project.turnoverDate = cell.value ? String(cell.value).split('T')[0] : null;
+        if (cell.columnId === COLS['Fire Final']) project.fireFinal = cell.value === true;
+        if (cell.columnId === COLS['SDV']) project.sdv = cell.value === true;
+        if (cell.columnId === COLS['Fire System Service']) project.fireSystemService = cell.value === true;
+        if (cell.columnId === COLS['Hood Ship Date']) project.hoodShipDate = cell.value ? String(cell.value).split('T')[0] : null;
+        if (cell.columnId === COLS['Site Contact']) project.siteContact = cell.value ? String(cell.value) : null;
+        if (cell.columnId === COLS['Site Contact #']) project.siteContactPhone = cell.value ? String(cell.value) : null;
+        if (cell.columnId === COLS['Site Contact Email']) project.siteContactEmail = cell.value ? String(cell.value) : null;
+        if (cell.columnId === COLS['FS #']) project.fsNumber = cell.value ? String(cell.value) : null;
       });
 
       // Only include rows with job numbers
-      if (company && job) {
-        projects.push({
-          id: `ss-${row.id}`,
-          company: String(company),
-          location: String(location || 'Unknown'),
-          job: String(Math.floor(job)),
-          status: String(status || 'Backlog'),
-          owner: owner ? String(owner) : null
-        });
+      if (project.company && project.job) {
+        projects.push(project);
       }
     });
 

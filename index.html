@@ -391,8 +391,10 @@
 
     <!-- Edit Card Modal -->
     <div class="modal" id="editCardModal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-height: 85vh; overflow-y: auto; max-width: 600px;">
             <h2>Edit Project</h2>
+            
+            <h3 style="font-size: 13px; color: #666; margin-top: 20px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">PROJECT INFO</h3>
             <div class="form-group">
                 <label>Company</label>
                 <input type="text" id="editCardCompany" placeholder="Company name">
@@ -420,6 +422,52 @@
                 </select>
             </div>
             <div class="form-group">
+                <label>Turnover Date</label>
+                <input type="date" id="editCardTurnoverDate">
+            </div>
+            
+            <h3 style="font-size: 13px; color: #666; margin-top: 20px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">SITE CONTACT</h3>
+            <div class="form-group">
+                <label>Site Contact Name</label>
+                <input type="text" id="editCardSiteContact" placeholder="Contact name">
+            </div>
+            <div class="form-group">
+                <label>Site Contact Phone</label>
+                <input type="text" id="editCardSiteContactPhone" placeholder="Phone number">
+            </div>
+            <div class="form-group">
+                <label>Site Contact Email</label>
+                <input type="email" id="editCardSiteContactEmail" placeholder="Email address">
+            </div>
+            
+            <h3 style="font-size: 13px; color: #666; margin-top: 20px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">MILESTONES</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="editCardFireFinal" style="cursor: pointer;">
+                    Fire Final
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="editCardSDV" style="cursor: pointer;">
+                    SDV
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="editCardFireSystemService" style="cursor: pointer;">
+                    Fire System Service
+                </label>
+            </div>
+            
+            <h3 style="font-size: 13px; color: #666; margin-top: 20px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">DATES & LOGISTICS</h3>
+            <div class="form-group">
+                <label>Hood Ship Date</label>
+                <input type="date" id="editCardHoodShipDate">
+            </div>
+            <div class="form-group">
+                <label>FS # (Fire System Number)</label>
+                <input type="text" id="editCardFsNumber" placeholder="Fire system number">
+            </div>
+            
+            <h3 style="font-size: 13px; color: #666; margin-top: 20px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">ASSIGNMENT</h3>
+            <div class="form-group">
                 <label>Assigned To</label>
                 <select id="editCardAssignee">
                     <option value="">Unassigned</option>
@@ -429,11 +477,8 @@
                     <option value="Austin">Austin</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Notes</label>
-                <textarea id="editCardNotes" placeholder="Notes" rows="3"></textarea>
-            </div>
-            <div class="form-buttons">
+            
+            <div class="form-buttons" style="margin-top: 20px;">
                 <button class="btn-primary" id="saveEditCardBtn">Save Changes</button>
                 <button class="btn-cancel" onclick="closeEditCardModal()">Cancel</button>
             </div>
@@ -545,17 +590,31 @@
 
             cardEl.innerHTML = `
                 <div class="card-company" style="cursor: pointer;" onclick="openEditCardModal('${card.id}', '${columnKey}')">${card.company}</div>
-                <div class="card-location" onclick="openEditCardModal('${card.id}', '${columnKey}')" style="cursor: pointer;">${card.location}</div>
-                ${card.job ? `<div class="card-job" onclick="openEditCardModal('${card.id}', '${columnKey}')" style="cursor: pointer;">Job #${card.job}</div>` : ''}
-                ${card.notes ? `<div class="card-details" onclick="openEditCardModal('${card.id}', '${columnKey}')" style="cursor: pointer;">${card.notes}</div>` : ''}
+                <div class="card-job" onclick="openEditCardModal('${card.id}', '${columnKey}')" style="cursor: pointer;">Job #${card.job} • ${card.status || 'Backlog'}</div>
+                ${card.turnoverDate ? `<div class="card-date" style="cursor: pointer; font-size: 11px; color: #999; margin: 4px 0;" onclick="openEditCardModal('${card.id}', '${columnKey}')">📅 ${card.turnoverDate}</div>` : ''}
+                ${card.siteContact ? `<div class="card-location" onclick="openEditCardModal('${card.id}', '${columnKey}')" style="cursor: pointer;">👤 ${card.siteContact}</div>` : ''}
+                <div style="display: flex; gap: 6px; margin: 8px 0; flex-wrap: wrap;">
+                    <label style="font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                        <input type="checkbox" ${card.fireFinal ? 'checked' : ''} onchange="updateCheckbox('${card.id}', '${columnKey}', 'fireFinal', this.checked)" style="cursor: pointer;">
+                        Fire Final
+                    </label>
+                    <label style="font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                        <input type="checkbox" ${card.sdv ? 'checked' : ''} onchange="updateCheckbox('${card.id}', '${columnKey}', 'sdv', this.checked)" style="cursor: pointer;">
+                        SDV
+                    </label>
+                    <label style="font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                        <input type="checkbox" ${card.fireSystemService ? 'checked' : ''} onchange="updateCheckbox('${card.id}', '${columnKey}', 'fireSystemService', this.checked)" style="cursor: pointer;">
+                        FS Service
+                    </label>
+                </div>
                 <div class="card-controls">
                     <select class="assign-dropdown" onchange="reassignCard('${card.id}', '${columnKey}', this.value)" onclick="event.stopPropagation()">
                         <option value="">Unassigned</option>
-                        ${ASSIGNEES.map(a => `<option value="${a}" ${card.assignee === a ? 'selected' : ''}>${a}</option>`).join('')}
+                        ${ASSIGNEES.map(a => `<option value="${a}" ${card.owner === a ? 'selected' : ''}>${a}</option>`).join('')}
                     </select>
                     <button class="card-delete" onclick="deleteCard('${card.id}', '${columnKey}'); event.stopPropagation()">Delete</button>
                 </div>
-                ${card.assignee ? `<div style="margin-top: 8px; font-size: 11px; color: #667eea; font-weight: 600;">👤 ${card.assignee}</div>` : ''}
+                ${card.owner ? `<div style="margin-top: 8px; font-size: 11px; color: #667eea; font-weight: 600;">👤 ${card.owner}</div>` : ''}
             `;
 
             return cardEl;
@@ -581,7 +640,7 @@
         function reassignCard(cardId, columnKey, assignee) {
             const card = cards[columnKey].find(c => c.id === cardId);
             if (card) {
-                card.assignee = assignee || null;
+                card.owner = assignee || null;
                 saveCards();
                 renderBoard();
             }
@@ -700,12 +759,29 @@
             const card = cards[columnKey].find(c => c.id === cardId);
             if (!card) return;
             
-            document.getElementById('editCardCompany').value = card.company;
-            document.getElementById('editCardLocation').value = card.location;
-            document.getElementById('editCardJob').value = card.job;
+            // Project info
+            document.getElementById('editCardCompany').value = card.company || '';
+            document.getElementById('editCardLocation').value = card.location || '';
+            document.getElementById('editCardJob').value = card.job || '';
             document.getElementById('editCardStatus').value = card.status || 'Backlog';
-            document.getElementById('editCardAssignee').value = card.assignee || '';
-            document.getElementById('editCardNotes').value = card.notes || '';
+            document.getElementById('editCardTurnoverDate').value = card.turnoverDate || '';
+            
+            // Site contact
+            document.getElementById('editCardSiteContact').value = card.siteContact || '';
+            document.getElementById('editCardSiteContactPhone').value = card.siteContactPhone || '';
+            document.getElementById('editCardSiteContactEmail').value = card.siteContactEmail || '';
+            
+            // Milestones (checkboxes)
+            document.getElementById('editCardFireFinal').checked = card.fireFinal || false;
+            document.getElementById('editCardSDV').checked = card.sdv || false;
+            document.getElementById('editCardFireSystemService').checked = card.fireSystemService || false;
+            
+            // Dates & logistics
+            document.getElementById('editCardHoodShipDate').value = card.hoodShipDate || '';
+            document.getElementById('editCardFsNumber').value = card.fsNumber || '';
+            
+            // Assignment
+            document.getElementById('editCardAssignee').value = card.owner || '';
             
             document.getElementById('editCardModal').classList.add('active');
         }
@@ -738,8 +814,7 @@
                 location,
                 job,
                 status,
-                assignee: assignee || null,
-                notes: ''
+                owner: assignee || null
             };
 
             // Add to kanban and sync to Smartsheet
@@ -789,8 +864,16 @@
             const company = document.getElementById('editCardCompany').value;
             const location = document.getElementById('editCardLocation').value;
             const status = document.getElementById('editCardStatus').value;
-            const assignee = document.getElementById('editCardAssignee').value;
-            const notes = document.getElementById('editCardNotes').value;
+            const owner = document.getElementById('editCardAssignee').value;
+            const turnoverDate = document.getElementById('editCardTurnoverDate').value;
+            const siteContact = document.getElementById('editCardSiteContact').value;
+            const siteContactPhone = document.getElementById('editCardSiteContactPhone').value;
+            const siteContactEmail = document.getElementById('editCardSiteContactEmail').value;
+            const fireFinal = document.getElementById('editCardFireFinal').checked;
+            const sdv = document.getElementById('editCardSDV').checked;
+            const fireSystemService = document.getElementById('editCardFireSystemService').checked;
+            const hoodShipDate = document.getElementById('editCardHoodShipDate').value;
+            const fsNumber = document.getElementById('editCardFsNumber').value;
 
             if (!company) {
                 alert('Please fill in company name');
@@ -803,8 +886,16 @@
                 card.company = company;
                 card.location = location;
                 card.status = status;
-                card.assignee = assignee || null;
-                card.notes = notes;
+                card.owner = owner || null;
+                card.turnoverDate = turnoverDate || null;
+                card.siteContact = siteContact || null;
+                card.siteContactPhone = siteContactPhone || null;
+                card.siteContactEmail = siteContactEmail || null;
+                card.fireFinal = fireFinal;
+                card.sdv = sdv;
+                card.fireSystemService = fireSystemService;
+                card.hoodShipDate = hoodShipDate || null;
+                card.fsNumber = fsNumber || null;
 
                 // Check if status changed (might need to move between columns)
                 const newColumnKey = STATUS_MAP[status] || 'backlog';
@@ -820,6 +911,18 @@
                 alert('✅ Project updated!');
             }
         };
+
+        function updateCheckbox(cardId, columnKey, checkboxType, isChecked) {
+            const card = cards[columnKey].find(c => c.id === cardId);
+            if (card) {
+                if (checkboxType === 'fireFinal') card.fireFinal = isChecked;
+                if (checkboxType === 'sdv') card.sdv = isChecked;
+                if (checkboxType === 'fireSystemService') card.fireSystemService = isChecked;
+                
+                saveCards();
+                renderBoard();
+            }
+        }
 
         // Load projects from Smartsheet on page init
         (async () => {
