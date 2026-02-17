@@ -1,28 +1,28 @@
 // Netlify serverless function to proxy Smartsheet API (no CORS issues!)
-// Deployed at: https://your-site.netlify.app/.netlify/functions/projects
+// Deployed at: https://nti-clawdbot.netlify.app/.netlify/functions/projects
 
-const SMARTSHEET_ID = '6669466080700292';
-const SMARTSHEET_TOKEN = '37CqtoRa11MAwh01gxAy20DKR0vrz2cZQZlgE';
+const SMARTSHEET_ID = '7612984097460100';
+const SMARTSHEET_TOKEN = '42c3kEQjAtF8UPFFUH6ejjnMK1fwt0cbg49iR';
 
-// Smartsheet column IDs
+// Smartsheet column IDs (from cloned sheet 7612984097460100)
 const COLS = {
-  Company: 8377424631097220,
-  Location: 1059075236620164,
-  'Job Number': 5562674863990660,
-  'NTi Hood Install': 1821797590454148,
-  'NTi TAB': 7085205822852996,
-  Status: 7474414543130500,
-  'Turnover Date': 3117391865505668,
-  'Fire Final': 3360332395636612,
-  'SDV': 5519380670533508,
-  'TAB': 4157645235480452,
-  'Hood Ship Date': 8197477746036612,
-  'Site Contact': 669709439920004,
-  'Site Contact #': 5173309067290500,
-  'Site Contact Email': 2921509253605252,
-  'Fire System Service': 8557701821058948,
-  'FS #': 8449242890981252,
-  'Coordinator': 6938750875291524
+  Company: 3940327155781508,
+  Location: 8443926783152004,
+  'Job Number': 1125577388674948,
+  'NTi Hood Install': 5629177016045444,
+  'NTi TAB': 3377377202360196,
+  Status: 2251477295517572,
+  'Turnover Date': 6755076922888068,
+  'Fire Final': 4503277109202820,
+  'SDV': 9006876736573316,
+  'TAB': 502115553156,
+  'Hood Ship Date': 4504101742923652,
+  'Site Contact': 1126402022395780,
+  'Site Contact #': 5630001649766276,
+  'Site Contact Email': 3378201836081028,
+  'Fire System Service': 7881801463451524,
+  'FS #': 563452068974468,
+  'Coordinator': 5137420440522628
 };
 
 exports.handler = async (event, context) => {
@@ -38,7 +38,7 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // Handle POST (add/update project)
+  // Handle POST (add project with two-step API call: POST to create, PUT to populate)
   if (event.httpMethod === 'POST') {
     try {
       const data = JSON.parse(event.body);
@@ -52,23 +52,15 @@ exports.handler = async (event, context) => {
         };
       }
 
-      // Create row in Smartsheet
-      const payload = {
+      // STEP 1: Create empty row
+      const createPayload = {
         rows: [{
           toBottom: true,
-          cells: [
-            { columnId: COLS.Company, value: company },
-            { columnId: COLS.Location, value: location },
-            { columnId: COLS['Job Number'], value: job },
-            { columnId: COLS.Status, value: status || 'Backlog' },
-            { columnId: COLS.Coordinator, value: owner || '' }
-          ]
+          cells: []
         }]
       };
 
-      console.log('POST Payload:', JSON.stringify(payload));
-
-      const response = await fetch(
+      const createResponse = await fetch(
         `https://api.smartsheet.com/2.0/sheets/${SMARTSHEET_ID}/rows`,
         {
           method: 'POST',
@@ -76,25 +68,63 @@ exports.handler = async (event, context) => {
             'Authorization': `Bearer ${SMARTSHEET_TOKEN}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(createPayload)
         }
       );
 
-      const responseData = await response.json();
-      console.log('Smartsheet Response:', responseData);
-
-      if (!response.ok) {
+      const createData = await createResponse.json();
+      if (!createResponse.ok || !createData.result) {
         return {
-          statusCode: response.status,
+          statusCode: createResponse.status,
           headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Smartsheet API error', details: responseData })
+          body: JSON.stringify({ error: 'Failed to create row', details: createData })
         };
       }
+
+      const newRowId = createData.result.id;
+      console.log(`Created row ${newRowId}, now populating with values...`);
+
+      // STEP 2: Update the row with actual values (Smartsheet API quirk: only PUT works for cell values)
+      const updatePayload = {
+        cells: [
+          { columnId: COLS.Company, value: company },
+          { columnId: COLS.Location, value: location },
+          { columnId: COLS['Job Number'], value: job },
+          { columnId: COLS.Status, value: status || 'Backlog' }
+        ]
+      };
+
+      if (owner) {
+        updatePayload.cells.push({ columnId: COLS.Coordinator, value: owner });
+      }
+
+      const updateResponse = await fetch(
+        `https://api.smartsheet.com/2.0/sheets/${SMARTSHEET_ID}/rows/${newRowId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${SMARTSHEET_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatePayload)
+        }
+      );
+
+      const updateData = await updateResponse.json();
+      if (!updateResponse.ok) {
+        return {
+          statusCode: updateResponse.status,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Failed to update row with values', details: updateData })
+        };
+      }
+
+      console.log(`✅ Project created successfully: ${company} (Job ${job})`);
 
       return {
         statusCode: 201,
         headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ success: true, message: 'Project created', data: responseData })
+        body: JSON.stringify({ success: true, message: 'Project created successfully', rowId: newRowId })
       };
     } catch (error) {
       return {
@@ -105,8 +135,8 @@ exports.handler = async (event, context) => {
     }
   }
 
+  // Handle GET (fetch projects from Smartsheet)
   try {
-    // Call Smartsheet API (server-side, no CORS issues!)
     const response = await fetch(
       `https://api.smartsheet.com/2.0/sheets/${SMARTSHEET_ID}`,
       {
