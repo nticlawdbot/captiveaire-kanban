@@ -94,9 +94,8 @@ exports.handler = async (event, context) => {
         ]
       };
 
-      if (owner) {
-        updatePayload.cells.push({ columnId: COLS.Coordinator, value: owner });
-      }
+      // Note: Coordinator is a CONTACT column type, don't set it via API (causes validation error)
+      // Users can set it manually in Smartsheet or we can handle it separately if needed
 
       const updateResponse = await fetch(
         `https://api.smartsheet.com/2.0/sheets/${SMARTSHEET_ID}/rows/${newRowId}`,
