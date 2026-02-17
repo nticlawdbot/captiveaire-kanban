@@ -330,7 +330,7 @@
                 <div class="status">
                     Last sync: <span id="last-sync">Never</span>
                 </div>
-                <button class="sync-btn" id="add-project-btn" onclick="openAddCardModal()">➕ Add Project</button>
+                <button class="sync-btn" id="add-project-btn" onclick="openAddProjectModal()">➕ Add Project</button>
                 <a href="leads.html" class="nav-link">📊 Go to Leads</a>
                 <button class="sync-btn" id="sync-btn">🔄 Sync Smartsheet</button>
             </div>
@@ -343,18 +343,12 @@
         </div>
     </div>
 
-    <!-- Add Card Modal -->
+    <!-- Add Project Modal -->
     <div class="modal" id="addCardModal">
         <div class="modal-content">
-            <h2>Add New Task</h2>
+            <h2>Add New Project</h2>
             <div class="form-group">
-                <label>Column</label>
-                <select id="newCardColumn">
-                    <option value="">Select column...</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Company / Title</label>
+                <label>Company</label>
                 <input type="text" id="newCardCompany" placeholder="e.g., Emmy Squared Pizza">
             </div>
             <div class="form-group">
@@ -363,7 +357,20 @@
             </div>
             <div class="form-group">
                 <label>Job #</label>
-                <input type="text" id="newCardJob" placeholder="e.g., JOB-12345">
+                <input type="text" id="newCardJob" placeholder="e.g., 6682010">
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="newCardStatus">
+                    <option value="Backlog">Backlog</option>
+                    <option value="Need to Contact">Need to Contact</option>
+                    <option value="Stalled">Stalled</option>
+                    <option value="Rough In">Rough In</option>
+                    <option value="Equipment Shipped">Equipment Shipped</option>
+                    <option value="SDV">SDV</option>
+                    <option value="Fire Final">Fire Final</option>
+                    <option value="Completed">Completed</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>Assigned To</label>
@@ -376,8 +383,59 @@
                 </select>
             </div>
             <div class="form-buttons">
-                <button class="btn-primary" id="saveCardBtn">Add Card</button>
+                <button class="btn-primary" id="saveCardBtn">Add Project</button>
                 <button class="btn-cancel" onclick="closeAddCardModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Card Modal -->
+    <div class="modal" id="editCardModal">
+        <div class="modal-content">
+            <h2>Edit Project</h2>
+            <div class="form-group">
+                <label>Company</label>
+                <input type="text" id="editCardCompany" placeholder="Company name">
+            </div>
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="editCardLocation" placeholder="Location">
+            </div>
+            <div class="form-group">
+                <label>Job #</label>
+                <input type="text" id="editCardJob" placeholder="Job number" readonly>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="editCardStatus">
+                    <option value="Backlog">Backlog</option>
+                    <option value="Need to Contact">Need to Contact</option>
+                    <option value="Stalled">Stalled</option>
+                    <option value="Rough In">Rough In</option>
+                    <option value="FS Rough-In">FS Rough-In</option>
+                    <option value="Equipment Shipped">Equipment Shipped</option>
+                    <option value="SDV">SDV</option>
+                    <option value="Fire Final">Fire Final</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Assigned To</label>
+                <select id="editCardAssignee">
+                    <option value="">Unassigned</option>
+                    <option value="Mike">Mike</option>
+                    <option value="Joe">Joe</option>
+                    <option value="Dan">Dan</option>
+                    <option value="Austin">Austin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea id="editCardNotes" placeholder="Notes" rows="3"></textarea>
+            </div>
+            <div class="form-buttons">
+                <button class="btn-primary" id="saveEditCardBtn">Save Changes</button>
+                <button class="btn-cancel" onclick="closeEditCardModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -385,10 +443,13 @@
     <script>
         const COLUMNS = {
             'backlog': '📋 Backlog',
-            'pre-kickoff': '🔧 Pre-Kickoff',
-            'in-progress': '⚙️ In Progress',
-            'awaiting': '⏳ Awaiting Client',
-            'complete': '✅ Complete'
+            'intro-email': '📧 Intro Email',
+            'stalled': '⏸️ Stalled',
+            'week-4': '📅 Week 4 Email',
+            'week-3': '📅 Week 3 Email',
+            'week-2': '📅 Week 2 Email',
+            'week-1': '📅 Week 1 Email',
+            'completed': '✅ Job Completed'
         };
 
         const ASSIGNEES = ['Mike', 'Joe', 'Dan', 'Austin'];
@@ -396,19 +457,20 @@
         // Status to Kanban column mapping
         const STATUS_MAP = {
             'Backlog': 'backlog',
-            'Pre-Kickoff': 'pre-kickoff',
-            'Pre-MS Services': 'pre-kickoff',
             'Upcoming': 'backlog',
-            'In Progress': 'in-progress',
-            'FS Rough-In': 'in-progress',
-            'Equipment Shipped': 'in-progress',
-            'SDV': 'awaiting',
-            'SDV Ready': 'awaiting',
-            'Fire Final': 'awaiting',
-            'Stalled': 'awaiting',
-            'Complete': 'complete',
-            'TCO': 'complete',
-            'Completed': 'complete'
+            'Need to Contact': 'intro-email',
+            'Stalled': 'stalled',
+            'Pre-MS Services': 'intro-email',
+            'Rough In': 'week-4',
+            'FS Rough-In': 'week-4',
+            'Equipment Shipped': 'week-3',
+            'SDV': 'week-2',
+            'SDV Ready': 'week-2',
+            'Fire Final': 'week-1',
+            'Complete': 'completed',
+            'TCO': 'completed',
+            'Completed': 'completed',
+            'Job Completed': 'completed'
         };
         
         let cards = JSON.parse(localStorage.getItem('kanbanCards')) || initializeDefaultCards();
@@ -417,36 +479,13 @@
         function initializeDefaultCards() {
             return {
                 'backlog': [],
-                'pre-kickoff': [
-                    {
-                        id: 'card-1',
-                        company: 'Emmy Squared Pizza',
-                        location: 'Boston, MA',
-                        job: 'JOB-001',
-                        assignee: 'Dan',
-                        notes: 'Setup phase - Opens Feb 27'
-                    },
-                    {
-                        id: 'card-2',
-                        company: 'Casa',
-                        location: 'Prairie Village, KS',
-                        job: 'JOB-003',
-                        assignee: 'Dan',
-                        notes: 'Design phase - Opening Feb 2026'
-                    }
-                ],
-                'in-progress': [
-                    {
-                        id: 'card-3',
-                        company: 'Freddy\'s',
-                        location: 'Fort Gregg Adams, VA',
-                        job: 'JOB-8169283',
-                        assignee: 'Mike',
-                        notes: 'Site Contact: Nick Yung'
-                    }
-                ],
-                'awaiting': [],
-                'complete': []
+                'intro-email': [],
+                'stalled': [],
+                'week-4': [],
+                'week-3': [],
+                'week-2': [],
+                'week-1': [],
+                'completed': []
             };
         }
 
@@ -505,16 +544,16 @@
             cardEl.ondragend = () => cardEl.classList.remove('dragging');
 
             cardEl.innerHTML = `
-                <div class="card-company">${card.company}</div>
-                <div class="card-location">${card.location}</div>
-                ${card.job ? `<div class="card-job">Job #${card.job}</div>` : ''}
-                ${card.notes ? `<div class="card-details">${card.notes}</div>` : ''}
+                <div class="card-company" style="cursor: pointer;" onclick="openEditCardModal('${card.id}', '${columnKey}')">${card.company}</div>
+                <div class="card-location" onclick="openEditCardModal('${card.id}', '${columnKey}')" style="cursor: pointer;">${card.location}</div>
+                ${card.job ? `<div class="card-job" onclick="openEditCardModal('${card.id}', '${columnKey}')" style="cursor: pointer;">Job #${card.job}</div>` : ''}
+                ${card.notes ? `<div class="card-details" onclick="openEditCardModal('${card.id}', '${columnKey}')" style="cursor: pointer;">${card.notes}</div>` : ''}
                 <div class="card-controls">
-                    <select class="assign-dropdown" onchange="reassignCard('${card.id}', '${columnKey}', this.value)">
+                    <select class="assign-dropdown" onchange="reassignCard('${card.id}', '${columnKey}', this.value)" onclick="event.stopPropagation()">
                         <option value="">Unassigned</option>
                         ${ASSIGNEES.map(a => `<option value="${a}" ${card.assignee === a ? 'selected' : ''}>${a}</option>`).join('')}
                     </select>
-                    <button class="card-delete" onclick="deleteCard('${card.id}', '${columnKey}')">Delete</button>
+                    <button class="card-delete" onclick="deleteCard('${card.id}', '${columnKey}'); event.stopPropagation()">Delete</button>
                 </div>
                 ${card.assignee ? `<div style="margin-top: 8px; font-size: 11px; color: #667eea; font-weight: 600;">👤 ${card.assignee}</div>` : ''}
             `;
@@ -637,11 +676,13 @@
             btn.textContent = '🔄 Sync Smartsheet';
         }
 
-        function openAddCardModal() {
+        function openAddProjectModal() {
             const modal = document.getElementById('addCardModal');
-            const select = document.getElementById('newCardColumn');
-            select.innerHTML = '<option value="">Select column...</option>' + 
-                Object.entries(COLUMNS).map(([key, label]) => `<option value="${key}">${label}</option>`).join('');
+            document.getElementById('newCardCompany').value = '';
+            document.getElementById('newCardLocation').value = '';
+            document.getElementById('newCardJob').value = '';
+            document.getElementById('newCardStatus').value = 'Backlog';
+            document.getElementById('newCardAssignee').value = '';
             modal.classList.add('active');
         }
 
@@ -649,31 +690,60 @@
             document.getElementById('addCardModal').classList.remove('active');
         }
 
+        let currentEditCardId = null;
+        let currentEditCardColumn = null;
+
+        function openEditCardModal(cardId, columnKey) {
+            currentEditCardId = cardId;
+            currentEditCardColumn = columnKey;
+            
+            const card = cards[columnKey].find(c => c.id === cardId);
+            if (!card) return;
+            
+            document.getElementById('editCardCompany').value = card.company;
+            document.getElementById('editCardLocation').value = card.location;
+            document.getElementById('editCardJob').value = card.job;
+            document.getElementById('editCardStatus').value = card.status || 'Backlog';
+            document.getElementById('editCardAssignee').value = card.assignee || '';
+            document.getElementById('editCardNotes').value = card.notes || '';
+            
+            document.getElementById('editCardModal').classList.add('active');
+        }
+
+        function closeEditCardModal() {
+            document.getElementById('editCardModal').classList.remove('active');
+            currentEditCardId = null;
+            currentEditCardColumn = null;
+        }
+
         document.getElementById('sync-btn').onclick = syncSmartsheet;
 
         document.getElementById('saveCardBtn').onclick = async () => {
-            const columnKey = document.getElementById('newCardColumn').value;
             const company = document.getElementById('newCardCompany').value;
             const location = document.getElementById('newCardLocation').value;
             const job = document.getElementById('newCardJob').value;
+            const status = document.getElementById('newCardStatus').value;
             const assignee = document.getElementById('newCardAssignee').value;
 
-            if (!columnKey || !company) {
-                alert('Please fill in column and company');
+            if (!company || !job) {
+                alert('Please fill in company and job number');
                 return;
             }
+
+            const columnKey = STATUS_MAP[status] || 'backlog';
 
             const newCard = {
                 id: `card-${Date.now()}`,
                 company,
                 location,
                 job,
+                status,
                 assignee: assignee || null,
                 notes: ''
             };
 
-            // Add to kanban (source of truth)
-            await syncProjectToGoogleSheet(company, location, job, 'New', assignee);
+            // Add to kanban and sync to Smartsheet
+            await syncProjectToSmartsheet(company, location, job, status, assignee);
 
             cards[columnKey].push(newCard);
             saveCards();
@@ -685,14 +755,71 @@
             document.getElementById('newCardCompany').value = '';
             document.getElementById('newCardLocation').value = '';
             document.getElementById('newCardJob').value = '';
+            document.getElementById('newCardStatus').value = 'Backlog';
             document.getElementById('newCardAssignee').value = '';
         };
 
-        async function syncProjectToGoogleSheet(company, location, job, status, assignee) {
-            // Note: In production, this would append to Google Sheet
-            // For now, we just log since the kanban is the source of truth
-            console.log(`✅ Project added to local kanban: ${company} (Job ${job})`);
+        async function syncProjectToSmartsheet(company, location, job, status, assignee) {
+            try {
+                const response = await fetch('/.netlify/functions/projects', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        company,
+                        location,
+                        job,
+                        status: status || 'Backlog',
+                        owner: assignee || ''
+                    })
+                });
+
+                if (response.ok) {
+                    console.log(`✅ Project synced to Smartsheet: ${company} (Job ${job})`);
+                } else {
+                    console.error('Sync failed:', response.status);
+                }
+            } catch (error) {
+                console.error('Smartsheet sync error:', error);
+            }
         }
+
+        document.getElementById('saveEditCardBtn').onclick = async () => {
+            if (!currentEditCardId || !currentEditCardColumn) return;
+
+            const company = document.getElementById('editCardCompany').value;
+            const location = document.getElementById('editCardLocation').value;
+            const status = document.getElementById('editCardStatus').value;
+            const assignee = document.getElementById('editCardAssignee').value;
+            const notes = document.getElementById('editCardNotes').value;
+
+            if (!company) {
+                alert('Please fill in company name');
+                return;
+            }
+
+            // Find the card and update it
+            const card = cards[currentEditCardColumn].find(c => c.id === currentEditCardId);
+            if (card) {
+                card.company = company;
+                card.location = location;
+                card.status = status;
+                card.assignee = assignee || null;
+                card.notes = notes;
+
+                // Check if status changed (might need to move between columns)
+                const newColumnKey = STATUS_MAP[status] || 'backlog';
+                if (newColumnKey !== currentEditCardColumn) {
+                    // Remove from old column, add to new
+                    cards[currentEditCardColumn] = cards[currentEditCardColumn].filter(c => c.id !== currentEditCardId);
+                    cards[newColumnKey].push(card);
+                }
+
+                saveCards();
+                renderBoard();
+                closeEditCardModal();
+                alert('✅ Project updated!');
+            }
+        };
 
         // Load projects from Smartsheet on page init
         (async () => {

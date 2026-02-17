@@ -21,10 +21,70 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type'
       }
     };
+  }
+
+  // Handle POST (add/update project)
+  if (event.httpMethod === 'POST') {
+    try {
+      const data = JSON.parse(event.body);
+      const { company, location, job, status, owner } = data;
+
+      if (!company || !job) {
+        return {
+          statusCode: 400,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Missing company or job' })
+        };
+      }
+
+      // Create row in Smartsheet
+      const response = await fetch(
+        `https://api.smartsheet.com/2.0/sheets/${SMARTSHEET_ID}/rows`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${SMARTSHEET_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            rows: [{
+              toBottom: true,
+              cells: [
+                { columnId: COLS.Company, value: company },
+                { columnId: COLS.Location, value: location },
+                { columnId: COLS['Job Number'], value: job },
+                { columnId: COLS.Status, value: status || 'Backlog' },
+                { columnId: COLS.Owner, value: owner || '' }
+              ]
+            }]
+          })
+        }
+      );
+
+      if (!response.ok) {
+        return {
+          statusCode: response.status,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Smartsheet API error' })
+        };
+      }
+
+      return {
+        statusCode: 201,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ success: true, message: 'Project created' })
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: error.message })
+      };
+    }
   }
 
   try {
