@@ -1,0 +1,7 @@
+[build]
+command = "echo 'No build needed'"
+functions = "functions"
+publish = "."
+
+[dev]
+functions = "functions"
