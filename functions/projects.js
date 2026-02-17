@@ -22,7 +22,7 @@ const COLS = {
   'Site Contact Email': 2921509253605252,
   'Fire System Service': 8557701821058948,
   'FS #': 8449242890981252,
-  Owner: 954079747198852
+  'Coordinator': 6938750875291524
 };
 
 exports.handler = async (event, context) => {
@@ -53,6 +53,21 @@ exports.handler = async (event, context) => {
       }
 
       // Create row in Smartsheet
+      const payload = {
+        rows: [{
+          toBottom: true,
+          cells: [
+            { columnId: COLS.Company, value: company },
+            { columnId: COLS.Location, value: location },
+            { columnId: COLS['Job Number'], value: job },
+            { columnId: COLS.Status, value: status || 'Backlog' },
+            { columnId: COLS.Coordinator, value: owner || '' }
+          ]
+        }]
+      };
+
+      console.log('POST Payload:', JSON.stringify(payload));
+
       const response = await fetch(
         `https://api.smartsheet.com/2.0/sheets/${SMARTSHEET_ID}/rows`,
         {
@@ -61,33 +76,25 @@ exports.handler = async (event, context) => {
             'Authorization': `Bearer ${SMARTSHEET_TOKEN}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            rows: [{
-              toBottom: true,
-              cells: [
-                { columnId: COLS.Company, value: company },
-                { columnId: COLS.Location, value: location },
-                { columnId: COLS['Job Number'], value: job },
-                { columnId: COLS.Status, value: status || 'Backlog' },
-                { columnId: COLS.Owner, value: owner || '' }
-              ]
-            }]
-          })
+          body: JSON.stringify(payload)
         }
       );
+
+      const responseData = await response.json();
+      console.log('Smartsheet Response:', responseData);
 
       if (!response.ok) {
         return {
           statusCode: response.status,
           headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Smartsheet API error' })
+          body: JSON.stringify({ error: 'Smartsheet API error', details: responseData })
         };
       }
 
       return {
         statusCode: 201,
         headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ success: true, message: 'Project created' })
+        body: JSON.stringify({ success: true, message: 'Project created', data: responseData })
       };
     } catch (error) {
       return {
@@ -134,7 +141,7 @@ exports.handler = async (event, context) => {
         if (cell.columnId === COLS.Location) project.location = String(cell.value || 'Unknown');
         if (cell.columnId === COLS['Job Number']) project.job = String(Math.floor(cell.value || 0));
         if (cell.columnId === COLS.Status) project.status = String(cell.value || 'Backlog');
-        if (cell.columnId === COLS.Owner) project.owner = cell.value ? String(cell.value) : null;
+        if (cell.columnId === COLS.Coordinator) project.owner = cell.value ? String(cell.value) : null;
         if (cell.columnId === COLS['Turnover Date']) project.turnoverDate = cell.value ? String(cell.value).split('T')[0] : null;
         if (cell.columnId === COLS['Fire Final']) project.fireFinal = cell.value === true;
         if (cell.columnId === COLS['SDV']) project.sdv = cell.value === true;
