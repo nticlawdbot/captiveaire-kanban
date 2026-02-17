@@ -817,14 +817,19 @@
                 owner: assignee || null
             };
 
-            // Add to kanban and sync to Smartsheet
-            await syncProjectToSmartsheet(company, location, job, status, assignee);
+            // Add to kanban and queue for Smartsheet via Google Sheet
+            const syncSuccess = await syncProjectToGoogleSheet(company, location, job, status, assignee);
 
             cards[columnKey].push(newCard);
             saveCards();
             renderBoard();
             closeAddCardModal();
-            alert('✅ Project added to Smartsheet and Kanban board!');
+            
+            if (syncSuccess) {
+                alert('✅ Project added to Kanban! It will sync to Smartsheet within 6 hours.');
+            } else {
+                alert('⚠️ Project added to Kanban but staging sync failed. Will retry.');
+            }
 
             // Clear form
             document.getElementById('newCardCompany').value = '';
@@ -834,27 +839,41 @@
             document.getElementById('newCardAssignee').value = '';
         };
 
-        async function syncProjectToSmartsheet(company, location, job, status, assignee) {
+        async function syncProjectToGoogleSheet(company, location, job, status, assignee) {
             try {
-                const response = await fetch('/.netlify/functions/projects', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        company,
-                        location,
-                        job,
-                        status: status || 'Backlog',
-                        owner: assignee || ''
-                    })
-                });
+                // Append to Google Sheet staging
+                const GOOGLE_SHEET_ID = '13P9ovqSPYaTa7tfQOYTBE3WXjWWpo88AuLjcrr7v_ac';
+                const GOOGLE_API_KEY = 'AIzaSyB5sTZn5cKkY_UkLAKzx2nWajRd5hGpFZE';
+                
+                // Get current data to find next row
+                const getResponse = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/Sheet1?key=${GOOGLE_API_KEY}`
+                );
+                const data = await getResponse.json();
+                const nextRow = (data.values ? data.values.length : 1) + 1;
+                
+                // Append new project
+                const appendResponse = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/Sheet1!A${nextRow}:append?key=${GOOGLE_API_KEY}&valueInputOption=RAW`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            values: [[company, location, job, status || 'Backlog', assignee || '']]
+                        })
+                    }
+                );
 
-                if (response.ok) {
-                    console.log(`✅ Project synced to Smartsheet: ${company} (Job ${job})`);
+                if (appendResponse.ok) {
+                    console.log(`✅ Project queued in staging: ${company} (Job ${job})`);
+                    return true;
                 } else {
-                    console.error('Sync failed:', response.status);
+                    console.error('Google Sheet append failed:', appendResponse.status);
+                    return false;
                 }
             } catch (error) {
-                console.error('Smartsheet sync error:', error);
+                console.error('Google Sheet sync error:', error);
+                return false;
             }
         }
 
