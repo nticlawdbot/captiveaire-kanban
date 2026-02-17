@@ -1,8 +1,8 @@
 // Netlify serverless function to proxy Smartsheet API (no CORS issues!)
 // Deployed at: https://nti-clawdbot.netlify.app/.netlify/functions/projects
 
-const SMARTSHEET_ID = '7612984097460100';
-const SMARTSHEET_TOKEN = '42c3kEQjAtF8UPFFUH6ejjnMK1fwt0cbg49iR';
+const SMARTSHEET_ID = '6669466080700292';
+const SMARTSHEET_TOKEN = '6Q82Fjy1NKLHhEufhHshTSi5gje1EfmtgXK0D';
 
 // Smartsheet column IDs (from cloned sheet 7612984097460100)
 const COLS = {
