@@ -955,14 +955,26 @@
             const btn = document.getElementById('sync-btn');
             btn.classList.add('syncing');
             btn.disabled = true;
-            btn.textContent = '⏳ Syncing from Google Sheet...';
+            btn.textContent = '⏳ Syncing leads...';
 
-            // Fetch fresh data from Google Sheet
-            await fetchLeadsFromSheet();
+            try {
+                const response = await fetch('/.netlify/functions/leads');
+                const data = await response.json();
+                
+                if (data.success && data.leads) {
+                    allLeads = data.leads;
+                    saveLeads();
+                    renderBoard();
+                    generateReports();
+                    document.getElementById('last-sync').textContent = new Date().toLocaleTimeString();
+                }
+            } catch (error) {
+                console.error('Sync error:', error);
+            }
             
             btn.classList.remove('syncing');
             btn.disabled = false;
-            btn.textContent = '🔄 Sync Smartsheet';
+            btn.textContent = '🔄 Sync Leads';
         }
 
         function applyFilters() {
@@ -1349,16 +1361,29 @@
             openAddLeadModal();
         };
 
-        // Load data on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            fetchLeadsFromSheet();
-        });
+        // Load data on page load via Netlify function
+        async function initializeLeads() {
+            try {
+                const response = await fetch('/.netlify/functions/leads');
+                const data = await response.json();
+                if (data.success && data.leads) {
+                    allLeads = data.leads;
+                    renderBoard();
+                    generateReports();
+                    document.getElementById('last-sync').textContent = 'Just now';
+                }
+            } catch (error) {
+                console.error('Failed to load leads:', error);
+                // Fallback to sample data in localStorage
+                renderBoard();
+                generateReports();
+            }
+        }
 
-        // Also call at end of script if DOM is already loaded
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', fetchLeadsFromSheet);
+            document.addEventListener('DOMContentLoaded', initializeLeads);
         } else {
-            fetchLeadsFromSheet();
+            initializeLeads();
         }
 
         // Manual card creation functions
