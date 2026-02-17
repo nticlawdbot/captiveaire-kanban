@@ -590,9 +590,10 @@
 
             cardEl.innerHTML = `
                 <div class="card-company" style="cursor: pointer;" onclick="openEditCardModal('${card.id}', '${columnKey}')">${card.company}</div>
+                ${card.location ? `<div class="card-location" style="cursor: pointer; font-size: 12px; color: #666; margin-bottom: 4px;" onclick="openEditCardModal('${card.id}', '${columnKey}')">${card.location}</div>` : ''}
                 <div class="card-job" onclick="openEditCardModal('${card.id}', '${columnKey}')" style="cursor: pointer;">Job #${card.job} • ${card.status || 'Backlog'}</div>
                 ${card.turnoverDate ? `<div class="card-date" style="cursor: pointer; font-size: 11px; color: #999; margin: 4px 0;" onclick="openEditCardModal('${card.id}', '${columnKey}')">📅 ${card.turnoverDate}</div>` : ''}
-                ${card.siteContact ? `<div class="card-location" onclick="openEditCardModal('${card.id}', '${columnKey}')" style="cursor: pointer;">👤 ${card.siteContact}</div>` : ''}
+                ${card.siteContact ? `<div style="cursor: pointer; font-size: 11px; color: #999; margin: 4px 0;" onclick="openEditCardModal('${card.id}', '${columnKey}')">👤 ${card.siteContact}</div>` : ''}
                 <div style="display: flex; gap: 6px; margin: 8px 0; flex-wrap: wrap;">
                     <label style="font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer;">
                         <input type="checkbox" ${card.fireFinal ? 'checked' : ''} onchange="updateCheckbox('${card.id}', '${columnKey}', 'fireFinal', this.checked)" style="cursor: pointer;">
@@ -686,7 +687,16 @@
                             location,
                             job: String(job).trim(),
                             status,
-                            assignee: project.owner || null,
+                            owner: project.owner || null,
+                            siteContact: project.siteContact || '',
+                            siteContactPhone: project.siteContactPhone || '',
+                            siteContactEmail: project.siteContactEmail || '',
+                            turnoverDate: project.turnoverDate || '',
+                            hoodShipDate: project.hoodShipDate || '',
+                            fsNumber: project.fsNumber || '',
+                            fireFinal: project.fireFinal || false,
+                            sdv: project.sdv || false,
+                            fireSystemService: project.fireSystemService || false,
                             notes: `Status: ${status}`
                         });
                     }
