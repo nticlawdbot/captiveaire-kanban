@@ -42,7 +42,8 @@ exports.handler = async (event, context) => {
   if (event.httpMethod === 'POST') {
     try {
       const data = JSON.parse(event.body);
-      const { company, location, job, status, owner } = data;
+      const { company, location, job, status } = data;
+      // Note: owner/assignee not used because Coordinator is a CONTACT type column in Smartsheet
 
       if (!company || !job) {
         return {
