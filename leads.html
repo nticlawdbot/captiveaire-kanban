@@ -711,22 +711,66 @@
 
     <script>
         const SHEET_ID = '1543222498119556';
+        const GOOGLE_SHEET_ID = '1TY76_jQl2KRuIk-CIUyYd2wzxaMB3w1ki0rpgXP3FyA';
+        const API_KEY = 'AIzaSyB5sTZn5cKkY_UkLAKzx2nWajRd5hGpFZE';
         const STAGES = ['Prospect', 'Qualified', 'Proposed', 'Won'];
-        const TERRITORIES = ['Kansas City, MO', 'Cincinnati, OH', 'National', 'Other'];
+        const TERRITORIES = ['Kansas City, MO', 'Cincinnati, OH', 'National', 'Other', 'Austin (Cincinnati)', 'Dan (KC)', 'Joe (Large Cincinnati)', 'Mike (National)'];
         const OWNERS = ['Mike', 'Joe', 'Dan', 'Austin'];
 
-        // Check if localStorage has old data (Dos Hermanos = old sample data)
-        let storedLeads = JSON.parse(localStorage.getItem('allLeads')) || [];
-        if (storedLeads.length > 0 && storedLeads[0].company === 'Dos Hermanos') {
-            // Old data detected - clear it
-            localStorage.removeItem('allLeads');
-            storedLeads = [];
-        }
-        
-        let allLeads = storedLeads;
+        let allLeads = [];
+        let leadsLoaded = false;
 
-        // Load sample data if empty
-        if (allLeads.length === 0) {
+        // Fetch leads from Google Sheet
+        async function fetchLeadsFromSheet() {
+            try {
+                const response = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/Sheet1?key=${API_KEY}`
+                );
+                
+                if (!response.ok) {
+                    console.error('Google Sheets API error:', response.status);
+                    loadSampleData();
+                    return;
+                }
+
+                const data = await response.json();
+                const rows = data.values || [];
+                
+                if (rows.length === 0) {
+                    loadSampleData();
+                    return;
+                }
+
+                // Parse rows (skip header)
+                const headers = rows[0];
+                allLeads = rows.slice(1).map(row => ({
+                    company: row[0] || '',
+                    contact: row[1] || '',
+                    email: row[2] || '',
+                    phone: row[3] || '',
+                    territory: row[4] || '',
+                    industry: row[5] || '',
+                    heat: row[6] || 'Cold',
+                    stage: row[7] || 'Prospect',
+                    owner: row[8] || '',
+                    nextSteps: row[9] || '',
+                    dateAdded: new Date().toISOString().split('T')[0],
+                    notes: ''
+                })).filter(lead => lead.company); // Only keep rows with company name
+
+                leadsLoaded = true;
+                console.log(`Loaded ${allLeads.length} leads from Google Sheet`);
+                renderBoard();
+                generateReports();
+                document.getElementById('last-sync').textContent = new Date().toLocaleTimeString();
+            } catch (error) {
+                console.error('Error fetching from Google Sheets:', error);
+                loadSampleData();
+            }
+        }
+
+        // Fallback to sample data if Sheet not available
+        function loadSampleData() {
             allLeads = [
                 {
                     company: 'Hemma Hemma Dinette',
@@ -899,32 +943,26 @@
                     source: 'Daily Research'
                 }
             ];
-            saveLeads();
+            leadsLoaded = true;
+            console.log(`Loaded ${allLeads.length} leads from sample data`);
         }
 
         function saveLeads() {
             localStorage.setItem('allLeads', JSON.stringify(allLeads));
         }
 
-        function syncSmartsheet() {
+        async function syncSmartsheet() {
             const btn = document.getElementById('sync-btn');
             btn.classList.add('syncing');
             btn.disabled = true;
-            btn.textContent = '⏳ Syncing...';
+            btn.textContent = '⏳ Syncing from Google Sheet...';
 
-            // Simulate sync - in production this calls Smartsheet API
-            setTimeout(() => {
-                const now = new Date().toLocaleTimeString();
-                document.getElementById('last-sync').textContent = now;
-                
-                btn.classList.remove('syncing');
-                btn.disabled = false;
-                btn.textContent = '🔄 Sync Smartsheet';
-                
-                // Refresh views
-                renderBoard();
-                generateReports();
-            }, 1500);
+            // Fetch fresh data from Google Sheet
+            await fetchLeadsFromSheet();
+            
+            btn.classList.remove('syncing');
+            btn.disabled = false;
+            btn.textContent = '🔄 Sync Smartsheet';
         }
 
         function applyFilters() {
@@ -1311,6 +1349,18 @@
             openAddLeadModal();
         };
 
+        // Load data on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            fetchLeadsFromSheet();
+        });
+
+        // Also call at end of script if DOM is already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', fetchLeadsFromSheet);
+        } else {
+            fetchLeadsFromSheet();
+        }
+
         // Manual card creation functions
         function openAddLeadModal() {
             const html = `
@@ -1513,10 +1563,6 @@
                 return false;
             }
         }
-
-        // Initial render
-        renderBoard();
-        generateReports();
     </script>
 </body>
 </html>
