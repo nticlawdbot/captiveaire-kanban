@@ -834,9 +834,11 @@
                 if (existingCard && existingColumnKey) {
                     // Update existing card with fresh data from Smartsheet
                     // BUT keep it in the column the user placed it in
+                    // IMPORTANT: Don't overwrite status - that's controlled by card column position
                     existingCard.company = freshProject.company;
                     existingCard.location = freshProject.location;
-                    existingCard.status = freshProject.status;
+                    // DO NOT update status - it's determined by which column the card is in
+                    // Status should sync FROM kanban TO Smartsheet, not the reverse
                     existingCard.turnoverDate = freshProject.turnoverDate;
                     existingCard.hoodShipDate = freshProject.hoodShipDate;
                     existingCard.siteContact = freshProject.siteContact;
