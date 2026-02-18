@@ -1017,13 +1017,11 @@
                 card.hoodShipDate = hoodShipDate || null;
                 card.fsNumber = fsNumber || null;
 
-                // Check if status changed (might need to move between columns)
-                const newColumnKey = STATUS_MAP[status] || 'backlog';
-                if (newColumnKey !== currentEditCardColumn) {
-                    // Remove from old column, add to new
-                    cards[currentEditCardColumn] = cards[currentEditCardColumn].filter(c => c.id !== currentEditCardId);
-                    cards[newColumnKey].push(card);
-                }
+                // IMPORTANT: DO NOT auto-move cards based on status changes!
+                // Kanban column position = manual milestone timing (Week 4, Week 3, etc.)
+                // Smartsheet Status = project work phase (Rough In, FS Rough-In, etc.)
+                // These are separate concerns. User controls column placement manually.
+                // Status field just updates in Smartsheet, card stays where user put it.
 
                 saveCards();
 
