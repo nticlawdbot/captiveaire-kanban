@@ -650,7 +650,8 @@
 
                 // Sync to Smartsheet if this is a Smartsheet row
                 if (card.id.startsWith('ss-')) {
-                    const rowId = card.id.replace('ss-', '');
+                    const rowId = card.id.substring(3); // Remove first 3 chars ('ss-')
+                    console.log(`🔍 Drag: Extracted rowId: "${rowId}" from cardId: "${card.id}"`);
                     updateProjectStatusInSmartsheet(rowId, newStatus);
                 }
             }
@@ -715,7 +716,8 @@
 
             // Delete from Smartsheet if this is a Smartsheet row
             if (cardId.startsWith('ss-')) {
-                const rowId = cardId.replace('ss-', '');
+                const rowId = cardId.substring(3); // Remove first 3 chars ('ss-')
+                console.log(`🔍 Delete: Extracted rowId: "${rowId}" from cardId: "${cardId}"`);
                 const deleteSuccess = await deleteProjectFromSmartsheet(rowId);
                 
                 if (deleteSuccess) {
@@ -1027,7 +1029,9 @@
 
                 // Sync to Smartsheet if this is a Smartsheet row (id starts with 'ss-')
                 if (currentEditCardId.startsWith('ss-')) {
-                    const rowId = currentEditCardId.replace('ss-', '');
+                    // Extract numeric rowId by removing 'ss-' prefix
+                    const rowId = currentEditCardId.substring(3); // Remove first 3 chars ('ss-')
+                    console.log(`🔍 Extracted rowId: "${rowId}" from cardId: "${currentEditCardId}"`);
                     const syncSuccess = await updateProjectInSmartsheet(rowId, company, location, status, turnoverDate, siteContact, siteContactPhone, siteContactEmail, fireFinal, sdv, fireSystemService, hoodShipDate, fsNumber);
                     
                     if (syncSuccess) {
