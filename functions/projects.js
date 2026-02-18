@@ -116,6 +116,7 @@ exports.handler = async (event, context) => {
       }
 
       // Build cells array with only fields that have values
+      // CRITICAL: Skip false boolean values - Smartsheet doesn't like them
       const cells = [];
       if (company !== undefined && company !== null) cells.push({ columnId: COLS.Company, value: company });
       if (location !== undefined && location !== null) cells.push({ columnId: COLS.Location, value: location });
@@ -124,9 +125,10 @@ exports.handler = async (event, context) => {
       if (siteContact !== undefined && siteContact !== null) cells.push({ columnId: COLS['Site Contact'], value: siteContact });
       if (siteContactPhone !== undefined && siteContactPhone !== null) cells.push({ columnId: COLS['Site Contact #'], value: siteContactPhone });
       if (siteContactEmail !== undefined && siteContactEmail !== null) cells.push({ columnId: COLS['Site Contact Email'], value: siteContactEmail });
-      if (fireFinal !== undefined) cells.push({ columnId: COLS['Fire Final'], value: fireFinal });
-      if (sdv !== undefined) cells.push({ columnId: COLS.SDV, value: sdv });
-      if (fireSystemService !== undefined) cells.push({ columnId: COLS['Fire System Service'], value: fireSystemService });
+      // Only send checkbox values if TRUE (Smartsheet hates false values)
+      if (fireFinal === true) cells.push({ columnId: COLS['Fire Final'], value: true });
+      if (sdv === true) cells.push({ columnId: COLS.SDV, value: true });
+      if (fireSystemService === true) cells.push({ columnId: COLS['Fire System Service'], value: true });
       if (hoodShipDate !== undefined && hoodShipDate !== null) cells.push({ columnId: COLS['Hood Ship Date'], value: hoodShipDate });
       if (fsNumber !== undefined && fsNumber !== null) cells.push({ columnId: COLS['FS #'], value: fsNumber });
 
