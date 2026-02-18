@@ -39,7 +39,7 @@ exports.handler = async (event, context) => {
   if (event.httpMethod === 'DELETE') {
     try {
       const data = JSON.parse(event.body);
-      const { rowId } = data;
+      let { rowId } = data;
 
       if (!rowId) {
         return {
@@ -47,6 +47,13 @@ exports.handler = async (event, context) => {
           headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
           body: JSON.stringify({ error: 'Missing rowId' })
         };
+      }
+
+      // CRITICAL: Strip 'ss-' prefix if present (client-side might not have done it)
+      if (rowId.startsWith('ss-')) {
+        console.log(`⚠️ Received rowId with 'ss-' prefix: ${rowId}, stripping...`);
+        rowId = rowId.substring(3);
+        console.log(`✅ Cleaned rowId: ${rowId}`);
       }
 
       // Delete the row from Smartsheet
@@ -91,7 +98,7 @@ exports.handler = async (event, context) => {
   if (event.httpMethod === 'PUT') {
     try {
       const data = JSON.parse(event.body);
-      const { rowId, company, location, status, turnoverDate, siteContact, siteContactPhone, siteContactEmail, fireFinal, sdv, fireSystemService, hoodShipDate, fsNumber } = data;
+      let { rowId, company, location, status, turnoverDate, siteContact, siteContactPhone, siteContactEmail, fireFinal, sdv, fireSystemService, hoodShipDate, fsNumber } = data;
 
       if (!rowId) {
         return {
@@ -99,6 +106,13 @@ exports.handler = async (event, context) => {
           headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
           body: JSON.stringify({ error: 'Missing rowId' })
         };
+      }
+
+      // CRITICAL: Strip 'ss-' prefix if present (client-side might not have done it)
+      if (rowId.startsWith('ss-')) {
+        console.log(`⚠️ Received rowId with 'ss-' prefix: ${rowId}, stripping...`);
+        rowId = rowId.substring(3);
+        console.log(`✅ Cleaned rowId: ${rowId}`);
       }
 
       // Build cells array with only fields that have values
