@@ -661,6 +661,8 @@
 
         async function updateProjectStatusInSmartsheet(rowId, newStatus) {
             try {
+                console.log(`📤 Sending status update to Smartsheet: rowId=${rowId}, status=${newStatus}`);
+                
                 const response = await fetch('/.netlify/functions/projects', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -670,15 +672,19 @@
                     })
                 });
 
+                const responseData = await response.json();
+                
                 if (response.ok) {
-                    console.log(`✅ Status updated in Smartsheet: ${newStatus}`);
+                    console.log(`✅ Status updated in Smartsheet: ${newStatus}`, responseData);
                     return true;
                 } else {
-                    console.error('Failed to update status in Smartsheet:', response.status);
+                    console.error('❌ Failed to update status in Smartsheet:', response.status, responseData);
+                    alert(`⚠️ Error updating status in Smartsheet: ${responseData.error || 'Unknown error'}`);
                     return false;
                 }
             } catch (error) {
-                console.error('Status update error:', error);
+                console.error('❌ Status update error:', error);
+                alert(`⚠️ Status update failed: ${error.message}`);
                 return false;
             }
         }
@@ -1052,6 +1058,17 @@
                     return dateStr;
                 };
 
+                const formattedTurnoverDate = formatDate(turnoverDate);
+                const formattedHoodShipDate = formatDate(hoodShipDate);
+                
+                console.log(`📤 Sending update to Smartsheet:`, {
+                    rowId,
+                    company,
+                    status,
+                    turnoverDate: formattedTurnoverDate,
+                    hoodShipDate: formattedHoodShipDate
+                });
+
                 const response = await fetch('/.netlify/functions/projects', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -1060,29 +1077,31 @@
                         company,
                         location,
                         status,
-                        turnoverDate: formatDate(turnoverDate),
+                        turnoverDate: formattedTurnoverDate,
                         siteContact: siteContact || null,
                         siteContactPhone: siteContactPhone || null,
                         siteContactEmail: siteContactEmail || null,
                         fireFinal,
                         sdv,
                         fireSystemService,
-                        hoodShipDate: formatDate(hoodShipDate),
+                        hoodShipDate: formattedHoodShipDate,
                         fsNumber: fsNumber || null
                     })
                 });
 
+                const responseData = await response.json();
+
                 if (response.ok) {
-                    const result = await response.json();
-                    console.log(`✅ Smartsheet sync successful for row ${rowId}`);
+                    console.log(`✅ Smartsheet sync successful for row ${rowId}`, responseData);
                     return true;
                 } else {
-                    const error = await response.json();
-                    console.error('Smartsheet sync error:', response.status, error);
+                    console.error('❌ Smartsheet sync failed:', response.status, responseData);
+                    alert(`⚠️ Failed to update Smartsheet: ${responseData.error || 'Unknown error'}`);
                     return false;
                 }
             } catch (error) {
-                console.error('Smartsheet update error:', error);
+                console.error('❌ Smartsheet update error:', error);
+                alert(`⚠️ Update failed: ${error.message}`);
                 return false;
             }
         }
