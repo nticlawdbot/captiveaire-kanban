@@ -805,23 +805,15 @@
         async function loadProjectsData() {
             const projects = await fetchProjectsFromSmartsheet();
             
-            // Merge Smartsheet projects into cards by column
-            // CRITICAL: Check if project exists ANYWHERE in cards (across all columns), not just in target column
+            // CRITICAL FIX: Replace local cards with fresh Smartsheet data
+            // Smartsheet is the source of truth since we have two-way sync
+            // All changes made in kanban are already synced to Smartsheet
+            cards = initializeDefaultCards();
+            
+            // Populate with fresh Smartsheet data
             projects.forEach(project => {
                 const columnKey = STATUS_MAP[project.status] || 'backlog';
-                
-                // Check if this Smartsheet row already exists (by Smartsheet ID, not job number)
-                let existsAnywhere = false;
-                Object.keys(cards).forEach(col => {
-                    if (cards[col].some(c => c.id === project.id)) {
-                        existsAnywhere = true;
-                    }
-                });
-                
-                // Only add if it doesn't already exist anywhere
-                if (!existsAnywhere) {
-                    cards[columnKey].push(project);
-                }
+                cards[columnKey].push(project);
             });
             
             saveCards();
@@ -1109,20 +1101,8 @@
 
         // Load projects from Smartsheet on page init
         (async () => {
-            // Try to load from Smartsheet via Netlify, then render
-            const projects = await fetchProjectsFromSmartsheet();
-            if (projects.length > 0) {
-                // Merge Smartsheet projects into localStorage
-                projects.forEach(project => {
-                    const columnKey = STATUS_MAP[project.status] || 'backlog';
-                    const exists = cards[columnKey].some(c => c.job === project.job);
-                    if (!exists) {
-                        cards[columnKey].push(project);
-                    }
-                });
-                saveCards();
-            }
-            renderBoard();
+            // Use the unified loadProjectsData function to avoid duplicate dedup logic
+            await loadProjectsData();
             
             // Update last sync time
             const now = new Date().toLocaleTimeString();
