@@ -702,18 +702,47 @@
         }
 
         async function deleteCard(cardId, columnKey) {
-            if (!confirm('Are you sure you want to delete this project?')) return;
+            if (!confirm('Are you sure you want to delete this project? This will DELETE from Smartsheet too.')) return;
             
             cards[columnKey] = cards[columnKey].filter(c => c.id !== cardId);
             saveCards();
 
-            // Note: Smartsheet rows should be archived/deleted in Smartsheet itself, not via kanban
-            // For now, we only delete from kanban local storage
+            // Delete from Smartsheet if this is a Smartsheet row
             if (cardId.startsWith('ss-')) {
-                console.log('⚠️ Project deleted from kanban. To delete from Smartsheet, archive/delete the row in Smartsheet directly.');
+                const rowId = cardId.replace('ss-', '');
+                const deleteSuccess = await deleteProjectFromSmartsheet(rowId);
+                
+                if (deleteSuccess) {
+                    console.log(`✅ Project deleted from both kanban and Smartsheet: ${rowId}`);
+                } else {
+                    console.error('⚠️ Project deleted from kanban but failed to delete from Smartsheet. Check browser console.');
+                }
             }
 
             renderBoard();
+        }
+
+        async function deleteProjectFromSmartsheet(rowId) {
+            try {
+                const response = await fetch('/.netlify/functions/projects', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rowId })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log(`✅ Row deleted from Smartsheet: ${rowId}`);
+                    return true;
+                } else {
+                    const error = await response.json();
+                    console.error('Smartsheet delete error:', response.status, error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Delete request error:', error);
+                return false;
+            }
         }
 
         async function fetchProjectsFromSmartsheet() {
@@ -777,12 +806,20 @@
             const projects = await fetchProjectsFromSmartsheet();
             
             // Merge Smartsheet projects into cards by column
+            // CRITICAL: Check if project exists ANYWHERE in cards (across all columns), not just in target column
             projects.forEach(project => {
                 const columnKey = STATUS_MAP[project.status] || 'backlog';
                 
-                // Check if project already exists (by job number)
-                const exists = cards[columnKey].some(c => c.job === project.job);
-                if (!exists) {
+                // Check if this Smartsheet row already exists (by Smartsheet ID, not job number)
+                let existsAnywhere = false;
+                Object.keys(cards).forEach(col => {
+                    if (cards[col].some(c => c.id === project.id)) {
+                        existsAnywhere = true;
+                    }
+                });
+                
+                // Only add if it doesn't already exist anywhere
+                if (!existsAnywhere) {
                     cards[columnKey].push(project);
                 }
             });
@@ -1010,6 +1047,19 @@
 
         async function updateProjectInSmartsheet(rowId, company, location, status, turnoverDate, siteContact, siteContactPhone, siteContactEmail, fireFinal, sdv, fireSystemService, hoodShipDate, fsNumber) {
             try {
+                // Convert dates to YYYY-MM-DD format (HTML date input gives YYYY-MM-DD, but ensure consistency)
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return null;
+                    // If already YYYY-MM-DD format, return as-is
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+                    // If M/D/YYYY format, convert to YYYY-MM-DD
+                    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
+                        const [month, day, year] = dateStr.split('/');
+                        return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    }
+                    return dateStr;
+                };
+
                 const response = await fetch('/.netlify/functions/projects', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -1018,14 +1068,14 @@
                         company,
                         location,
                         status,
-                        turnoverDate: turnoverDate || null,
+                        turnoverDate: formatDate(turnoverDate),
                         siteContact: siteContact || null,
                         siteContactPhone: siteContactPhone || null,
                         siteContactEmail: siteContactEmail || null,
                         fireFinal,
                         sdv,
                         fireSystemService,
-                        hoodShipDate: hoodShipDate || null,
+                        hoodShipDate: formatDate(hoodShipDate),
                         fsNumber: fsNumber || null
                     })
                 });

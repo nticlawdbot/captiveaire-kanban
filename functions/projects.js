@@ -29,10 +29,62 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type'
       }
     };
+  }
+
+  // Handle DELETE (archive/delete row from Smartsheet)
+  if (event.httpMethod === 'DELETE') {
+    try {
+      const data = JSON.parse(event.body);
+      const { rowId } = data;
+
+      if (!rowId) {
+        return {
+          statusCode: 400,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Missing rowId' })
+        };
+      }
+
+      // Delete the row from Smartsheet
+      const deleteResponse = await fetch(
+        `https://api.smartsheet.com/2.0/sheets/${SMARTSHEET_ID}/rows/${rowId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${SMARTSHEET_TOKEN}`
+          }
+        }
+      );
+
+      if (!deleteResponse.ok) {
+        const error = await deleteResponse.json();
+        console.error('Smartsheet DELETE error:', error);
+        return {
+          statusCode: deleteResponse.status,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Failed to delete row', details: error })
+        };
+      }
+
+      console.log(`✅ Row deleted from Smartsheet: ${rowId}`);
+
+      return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ success: true, message: 'Row deleted successfully', rowId })
+      };
+    } catch (error) {
+      console.error('DELETE error:', error);
+      return {
+        statusCode: 500,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: error.message })
+      };
+    }
   }
 
   // Handle PUT (update existing project in Smartsheet)
