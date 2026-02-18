@@ -3,177 +3,156 @@
     {
       "company": "Short Vine",
       "location": "Cincinnati, OH",
-      "job": 6682010,
+      "job": "6682010",
       "status": "Stalled",
-      "owner": ""
+      "owner": "Rie  Rothschuh"
     },
     {
       "company": "Jay's Kitchen",
       "location": "Cincinnati, OH",
-      "job": 7015441,
+      "job": "7015441",
       "status": "Stalled",
-      "owner": ""
+      "owner": "Mohammad Arabiat"
     },
     {
       "company": "Lagman House",
       "location": "Cincinnati, OH",
-      "job": 7605484,
+      "job": "7605484",
       "status": "Stalled",
-      "owner": ""
+      "owner": "Mohammad Arabiat"
     },
     {
       "company": "Concorde (Whetsel Ave)",
       "location": "Cincinnati, OH",
-      "job": 7623169,
+      "job": "7623169",
       "status": "FS Rough-In",
-      "owner": ""
+      "owner": "Dominic Sansalone"
     },
     {
       "company": "Essen",
       "location": "Cincinnati, OH",
-      "job": 6703553,
+      "job": "6703553",
       "status": "FS Rough-In",
-      "owner": ""
+      "owner": "Rie Rothschuh"
     },
     {
       "company": "Jack's Place",
       "location": "Peebles, OH",
-      "job": 7536792,
+      "job": "7536792",
       "status": "SDV",
-      "owner": ""
+      "owner": "Josh Lloyd"
     },
     {
       "company": "Westfield Collective",
       "location": "Westfield, IN",
-      "job": 7424506,
+      "job": "7424506",
       "status": "SDV",
-      "owner": ""
+      "owner": "Chad Tragesser"
     },
     {
       "company": "Los Tres Mangos De Michoacan",
       "location": "Springdale, OH",
-      "job": 7595497,
+      "job": "7595497",
       "status": "Upcoming",
-      "owner": ""
+      "owner": "Rie Rothschuh"
     },
     {
       "company": "Hook Fish N Chicken",
       "location": "Delhi, OH",
-      "job": 6791780,
+      "job": "6791780",
       "status": "Pre-MS Services",
-      "owner": ""
+      "owner": "Mohammad Arabiat"
     },
     {
       "company": "City BBQ",
       "location": "Murfreesboro, TN",
-      "job": 7564876,
+      "job": "7564876",
       "status": "Pre-MS Services",
-      "owner": ""
+      "owner": "TBD"
     },
     {
       "company": "Sole Mia",
       "location": "Miami, FL",
-      "job": 7334756,
+      "job": "7334756",
       "status": "Pre-MS Services",
-      "owner": ""
+      "owner": "TBD"
     },
     {
       "company": "Penn Station",
       "location": "Union, KY",
-      "job": 8225907,
+      "job": "8225907",
       "status": "Rough In",
-      "owner": ""
+      "owner": "Mike Bantel"
     },
     {
       "company": "BWW GO",
       "location": "Teays Valley, WV",
-      "job": 7638513,
+      "job": "7638513",
       "status": "Rough In",
-      "owner": ""
+      "owner": "TBD"
     },
     {
       "company": "Third Street Social",
       "location": "Olathe, KS",
-      "job": 7623656,
+      "job": "7623656",
       "status": "Rough In",
-      "owner": ""
+      "owner": "Mitch Golubski"
     },
     {
       "company": "Freddy's",
       "location": "Galesburg, IL",
-      "job": 7500166,
+      "job": "7500166",
       "status": "Need to Contact",
-      "owner": ""
-    },
-    {
-      "company": "Freddy's",
-      "location": "Fort Gregg Adams, VA",
-      "job": 8169283,
-      "status": "",
-      "owner": ""
+      "owner": "Jason Hendrickson"
     },
     {
       "company": "Freddy's",
       "location": "Freehold, NJ",
-      "job": 8367429,
+      "job": "8367429",
       "status": "Upcoming",
-      "owner": ""
+      "owner": "Nick Yung"
     },
     {
       "company": "Freddy's",
       "location": "Missouri City, TX",
-      "job": 7474661,
-      "status": "Need to Contact",
-      "owner": ""
+      "job": "7474661",
+      "status": "FS Rough-In",
+      "owner": "Chris Fox"
     },
     {
       "company": "Norborne School District",
       "location": "Norborne, MO",
-      "job": 7475550,
-      "status": "Fire Final",
-      "owner": ""
+      "job": "7475550",
+      "status": "Need to Contact",
+      "owner": "Scott McLallen"
     },
     {
       "company": "Hawaiian Bros",
       "location": "Scottsdale, AZ",
-      "job": 6271970,
+      "job": "6271970",
       "status": "Rough In",
-      "owner": ""
+      "owner": "Anthony Crincoli"
     },
     {
       "company": "Heroes Home Gate",
       "location": "Kansas City, MO",
-      "job": 5165475,
+      "job": "5165475",
       "status": "FS Rough-In",
-      "owner": ""
+      "owner": "Pat Sardo"
     },
     {
       "company": "Applebee's",
       "location": "Henderson, NV",
-      "job": 7382146,
+      "job": "7382146",
       "status": "Need to Contact",
-      "owner": ""
+      "owner": "Peter Martin"
     },
     {
       "company": "Hawaiian Bros",
       "location": "Norman, OK",
-      "job": 8274699,
+      "job": "8274699",
       "status": "Need to Contact",
-      "owner": ""
-    },
-    {
-      "company": "Sugar Creek Community",
-      "location": "Joplin, MO",
-      "job": 7154420,
-      "status": "",
-      "owner": ""
-    },
-    {
-      "company": "",
-      "location": "",
-      "job": 7589820,
-      "status": "",
-      "owner": ""
+      "owner": "TBD"
     }
   ]
 }
