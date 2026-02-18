@@ -813,15 +813,46 @@
         async function loadProjectsData() {
             const projects = await fetchProjectsFromSmartsheet();
             
-            // CRITICAL FIX: Replace local cards with fresh Smartsheet data
-            // Smartsheet is the source of truth since we have two-way sync
-            // All changes made in kanban are already synced to Smartsheet
-            cards = initializeDefaultCards();
+            // CRITICAL FIX: Update card data but PRESERVE column positions!
+            // Smartsheet data (status, dates, contacts) is source of truth
+            // But kanban column position (Week 4, Week 2, etc.) is user's manual choice
+            // Don't reorganize cards based on status—keep them where user placed them
             
-            // Populate with fresh Smartsheet data
-            projects.forEach(project => {
-                const columnKey = STATUS_MAP[project.status] || 'backlog';
-                cards[columnKey].push(project);
+            projects.forEach(freshProject => {
+                // Find existing card with same job number
+                let existingCard = null;
+                let existingColumnKey = null;
+                
+                Object.keys(cards).forEach(col => {
+                    const found = cards[col].find(c => c.job === freshProject.job && c.job !== '0');
+                    if (found) {
+                        existingCard = found;
+                        existingColumnKey = col;
+                    }
+                });
+                
+                if (existingCard && existingColumnKey) {
+                    // Update existing card with fresh data from Smartsheet
+                    // BUT keep it in the column the user placed it in
+                    existingCard.company = freshProject.company;
+                    existingCard.location = freshProject.location;
+                    existingCard.status = freshProject.status;
+                    existingCard.turnoverDate = freshProject.turnoverDate;
+                    existingCard.hoodShipDate = freshProject.hoodShipDate;
+                    existingCard.siteContact = freshProject.siteContact;
+                    existingCard.siteContactPhone = freshProject.siteContactPhone;
+                    existingCard.siteContactEmail = freshProject.siteContactEmail;
+                    existingCard.fireFinal = freshProject.fireFinal;
+                    existingCard.sdv = freshProject.sdv;
+                    existingCard.fireSystemService = freshProject.fireSystemService;
+                    existingCard.fsNumber = freshProject.fsNumber;
+                    existingCard.owner = freshProject.owner;
+                } else {
+                    // New project from Smartsheet (doesn't exist in kanban yet)
+                    // Place it in column based on status
+                    const columnKey = STATUS_MAP[freshProject.status] || 'backlog';
+                    cards[columnKey].push(freshProject);
+                }
             });
             
             saveCards();
