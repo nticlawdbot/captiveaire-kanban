@@ -169,20 +169,11 @@
       "owner": ""
     },
     {
-      "company": "",
-      "location": "",
-      "job": "7589820",
-      "status": "",
-      "owner": ""
-    },
-    {
       "company": "Freddy's",
       "location": "Gilbert, AZ",
       "job": "7518748",
       "status": "Need to Contact",
       "owner": ""
     }
-  ],
-  "synced_at": "2026-02-21T12:00:00Z",
-  "count": 26
+  ]
 }
