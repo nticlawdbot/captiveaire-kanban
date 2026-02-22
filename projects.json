@@ -1,4 +1,3 @@
-Total projects: 25
 {
   "projects": [
     {
@@ -6,49 +5,49 @@ Total projects: 25
       "location": "Cincinnati, OH",
       "job": "6682010",
       "status": "Stalled",
-      "owner": "Rie  Rothschuh"
+      "owner": ""
     },
     {
       "company": "Jay's Kitchen",
       "location": "Cincinnati, OH",
       "job": "7015441",
       "status": "Stalled",
-      "owner": "Mohammad Arabiat"
+      "owner": ""
     },
     {
       "company": "Lagman House",
       "location": "Cincinnati, OH",
       "job": "7605484",
       "status": "Stalled",
-      "owner": "Mohammad Arabiat"
+      "owner": ""
     },
     {
       "company": "Concorde (Whetsel Ave)",
       "location": "Cincinnati, OH",
       "job": "7623169",
       "status": "FS Rough-In",
-      "owner": "Dominic Sansalone"
+      "owner": ""
     },
     {
       "company": "Essen",
       "location": "Cincinnati, OH",
       "job": "6703553",
       "status": "FS Rough-In",
-      "owner": "Rie Rothschuh"
+      "owner": ""
     },
     {
       "company": "Jack's Place",
       "location": "Peebles, OH",
       "job": "7536792",
       "status": "SDV",
-      "owner": "Josh Lloyd"
+      "owner": ""
     },
     {
       "company": "Westfield Collective",
       "location": "Westfield, IN",
       "job": "7424506",
       "status": "Fire Final",
-      "owner": "Chad Tragesser"
+      "owner": ""
     },
     {
       "company": "Los Tres Mangos De Michoacan",
@@ -62,7 +61,7 @@ Total projects: 25
       "location": "Delhi, OH",
       "job": "6791780",
       "status": "Pre-MS Services",
-      "owner": "Mohammad Arabiat"
+      "owner": ""
     },
     {
       "company": "City BBQ",
@@ -83,7 +82,7 @@ Total projects: 25
       "location": "Union, KY",
       "job": "8225907",
       "status": "Rough In",
-      "owner": "Mike Bantel"
+      "owner": ""
     },
     {
       "company": "BWW GO",
@@ -97,63 +96,63 @@ Total projects: 25
       "location": "Olathe, KS",
       "job": "7623656",
       "status": "Rough In",
-      "owner": "Mitch Golubski"
+      "owner": ""
     },
     {
       "company": "Freddy's",
       "location": "Galesburg, IL",
       "job": "7500166",
       "status": "Need to Contact",
-      "owner": "Jason Hendrickson"
+      "owner": ""
     },
     {
       "company": "Freddy's",
       "location": "Fort Gregg Adams, VA",
       "job": "8169283",
       "status": "Need to Contact",
-      "owner": "Nick Yung"
+      "owner": ""
     },
     {
       "company": "Freddy's",
       "location": "Freehold, NJ",
       "job": "8367429",
       "status": "Pre-MS Services",
-      "owner": "Nick Yung"
+      "owner": ""
     },
     {
       "company": "Freddy's",
       "location": "Missouri City, TX",
       "job": "7474661",
       "status": "SDV",
-      "owner": "Chris Fox"
+      "owner": ""
     },
     {
       "company": "Norborne School District",
       "location": "Norborne, MO",
       "job": "7475550",
       "status": "Need to Contact",
-      "owner": "Scott McLallen"
+      "owner": ""
     },
     {
       "company": "Hawaiian Bros",
       "location": "Scottsdale, AZ",
       "job": "6271970",
       "status": "Rough In",
-      "owner": "Anthony Crincoli"
+      "owner": ""
     },
     {
       "company": "Heroes Home Gate",
       "location": "Kansas City, MO",
       "job": "5165475",
       "status": "FS Rough-In",
-      "owner": "Pat Sardo"
+      "owner": ""
     },
     {
       "company": "Applebee's",
       "location": "Henderson, NV",
       "job": "7382146",
       "status": "Need to Contact",
-      "owner": "Peter Martin"
+      "owner": ""
     },
     {
       "company": "Hawaiian Bros",
@@ -167,14 +166,21 @@ Total projects: 25
       "location": "Frontenac, KS",
       "job": "7154420",
       "status": "Need to Contact",
-      "owner": "Jack Young"
+      "owner": ""
+    },
+    {
+      "company": "",
+      "location": "",
+      "job": "7589820",
+      "status": "",
+      "owner": ""
     },
     {
       "company": "Freddy's",
       "location": "Gilbert, AZ",
       "job": "7518748",
       "status": "Need to Contact",
-      "owner": "Norm Evans"
+      "owner": ""
     }
   ]
 }
