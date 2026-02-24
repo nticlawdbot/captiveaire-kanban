@@ -1,3 +1,186 @@
 {
-  "projects": []
+  "projects": [
+    {
+      "company": "Short Vine",
+      "location": "Cincinnati, OH",
+      "job": "6682010.0",
+      "status": "Stalled",
+      "owner": ""
+    },
+    {
+      "company": "Jay's Kitchen",
+      "location": "Cincinnati, OH",
+      "job": "7015441.0",
+      "status": "Stalled",
+      "owner": ""
+    },
+    {
+      "company": "Lagman House",
+      "location": "Cincinnati, OH",
+      "job": "7605484.0",
+      "status": "Stalled",
+      "owner": ""
+    },
+    {
+      "company": "Concorde (Whetsel Ave)",
+      "location": "Cincinnati, OH",
+      "job": "7623169.0",
+      "status": "FS Rough-In",
+      "owner": ""
+    },
+    {
+      "company": "Essen",
+      "location": "Cincinnati, OH",
+      "job": "6703553.0",
+      "status": "FS Rough-In",
+      "owner": ""
+    },
+    {
+      "company": "Jack's Place",
+      "location": "Peebles, OH",
+      "job": "7536792.0",
+      "status": "SDV",
+      "owner": ""
+    },
+    {
+      "company": "Westfield Collective",
+      "location": "Westfield, IN",
+      "job": "7424506.0",
+      "status": "Fire Final",
+      "owner": ""
+    },
+    {
+      "company": "Los Tres Mangos De Michoacan",
+      "location": "Springdale, OH",
+      "job": "7595497.0",
+      "status": "Upcoming",
+      "owner": ""
+    },
+    {
+      "company": "Hook Fish N Chicken",
+      "location": "Delhi, OH",
+      "job": "6791780.0",
+      "status": "Pre-MS Services",
+      "owner": ""
+    },
+    {
+      "company": "City BBQ",
+      "location": "Murfreesboro, TN",
+      "job": "7564876.0",
+      "status": "Pre-MS Services",
+      "owner": ""
+    },
+    {
+      "company": "Sole Mia",
+      "location": "Miami, FL",
+      "job": "7334756.0",
+      "status": "Pre-MS Services",
+      "owner": ""
+    },
+    {
+      "company": "Penn Station",
+      "location": "Union, KY",
+      "job": "8225907.0",
+      "status": "Rough In",
+      "owner": ""
+    },
+    {
+      "company": "BWW GO",
+      "location": "Teays Valley, WV",
+      "job": "7638513.0",
+      "status": "Rough In",
+      "owner": ""
+    },
+    {
+      "company": "Third Street Social",
+      "location": "Olathe, KS",
+      "job": "7623656.0",
+      "status": "Rough In",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Galesburg, IL",
+      "job": "7500166.0",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Fort Gregg Adams, VA",
+      "job": "8169283.0",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Freehold, NJ",
+      "job": "8367429.0",
+      "status": "Pre-MS Services",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Missouri City, TX",
+      "job": "7474661.0",
+      "status": "SDV",
+      "owner": ""
+    },
+    {
+      "company": "Norborne School District",
+      "location": "Norborne, MO",
+      "job": "7475550.0",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Hawaiian Bros",
+      "location": "Scottsdale, AZ",
+      "job": "6271970.0",
+      "status": "Rough In",
+      "owner": ""
+    },
+    {
+      "company": "Heroes Home Gate",
+      "location": "Kansas City, MO",
+      "job": "5165475.0",
+      "status": "FS Rough-In",
+      "owner": ""
+    },
+    {
+      "company": "Applebee's",
+      "location": "Henderson, NV",
+      "job": "7382146.0",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Hawaiian Bros",
+      "location": "Norman, OK",
+      "job": "8274699.0",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Sugar Creek Community",
+      "location": "Frontenac, KS",
+      "job": "7154420.0",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "",
+      "location": "",
+      "job": "7589820.0",
+      "status": "",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Gilbert, AZ",
+      "job": "7518748",
+      "status": "Need to Contact",
+      "owner": ""
+    }
+  ]
 }
