@@ -1,352 +1,81 @@
-[
-  {
-    "company": "X",
-    "location": "CINCINNATI:",
-    "job": "LOCAL",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "Short Vine",
-    "job": "Cincinnati, OH",
-    "status": 6682010.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Jay's Kitchen",
-    "job": "Cincinnati, OH",
-    "status": 7015441.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Lagman House",
-    "job": "Cincinnati, OH",
-    "status": 7605484.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Concorde (Whetsel Ave)",
-    "job": "Cincinnati, OH",
-    "status": 7623169.0,
-    "owner": "Yes ✅"
-  },
-  {
-    "company": "",
-    "location": "LaRosa's (Big Ash Brew)",
-    "job": "Cincinnati, OH",
-    "status": "",
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Essen",
-    "job": "Cincinnati, OH",
-    "status": 6703553.0,
-    "owner": "Yes ✅"
-  },
-  {
-    "company": "",
-    "location": "Jack's Place",
-    "job": "Peebles, OH",
-    "status": 7536792.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Westfield Collective",
-    "job": "Westfield, IN",
-    "status": 7424506.0,
-    "owner": "Yes ✅"
-  },
-  {
-    "company": "",
-    "location": "Los Tres Mangos De Michoacan",
-    "job": "Springdale, OH",
-    "status": 7595497.0,
-    "owner": "Yes ✅"
-  },
-  {
-    "company": "",
-    "location": "Hook Fish N Chicken",
-    "job": "Delhi, OH",
-    "status": 6791780.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "X",
-    "location": "CINCINNATI:",
-    "job": "OUT OF TOWN",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "City BBQ",
-    "job": "Murfreesboro, TN",
-    "status": 7564876.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Sole Mia",
-    "job": "Miami, FL",
-    "status": 7334756.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "PopUp Bagels (Gulch)",
-    "job": "Nashville, TN",
-    "status": "",
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "PopUp Bagels",
-    "job": "Georgetown D.C",
-    "status": "",
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "PopUp Bagels",
-    "job": "Ardmore, PA",
-    "status": "",
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Penn Station",
-    "job": "Union, KY",
-    "status": 8225907.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "BWW GO",
-    "job": "Teays Valley, WV",
-    "status": 7638513.0,
-    "owner": "No"
-  },
-  {
-    "company": "X",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "X",
-    "location": "KANSAS CITY:",
-    "job": "HIGH PRIORITY",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "Third Street Social",
-    "job": "Olathe, KS",
-    "status": 7623656.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "X",
-    "location": "KANSAS CITY:",
-    "job": "FREDDY'S",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "Freddy's",
-    "job": "Galesburg, IL",
-    "status": 7500166.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Freddy's",
-    "job": "Fort Gregg Adams, VA",
-    "status": 8169283.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Freddy's",
-    "job": "Freehold, NJ",
-    "status": 8367429.0,
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "Freddy's",
-    "job": "Missouri City, TX",
-    "status": 7474661.0,
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "X",
-    "location": "KANSAS CITY:",
-    "job": "REGULAR",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "Norborne School District",
-    "job": "Norborne, MO",
-    "status": 7475550.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Hawaiian Bros",
-    "job": "Scottsdale, AZ",
-    "status": 6271970.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Heroes Home Gate",
-    "job": "Kansas City, MO",
-    "status": 5165475.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Applebee's",
-    "job": "Henderson, NV",
-    "status": 7382146.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Hawaiian Bros",
-    "job": "Norman, OK",
-    "status": 8274699.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "Sugar Creek Community",
-    "job": "Frontenac, KS",
-    "status": 7154420.0,
-    "owner": "No"
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": 7589820.0,
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "",
-    "job": "",
-    "status": "",
-    "owner": ""
-  },
-  {
-    "company": "",
-    "location": "Freddy's",
-    "job": "Gilbert, AZ",
-    "status": "7518748",
-    "owner": ""
-  }
-]
+{
+  "projects": [
+    {
+      "company": "Freddy's",
+      "location": "Galesburg, IL",
+      "job": "7500166",
+      "status": "Need to Contact",
+      "owner": "Mike Frey"
+    },
+    {
+      "company": "Freddy's",
+      "location": "Fort Gregg Adams, VA",
+      "job": "8169283",
+      "status": "Need to Contact",
+      "owner": "Singer"
+    },
+    {
+      "company": "Freddy's",
+      "location": "Freehold, NJ",
+      "job": "8367429",
+      "status": "Pre-MS Services",
+      "owner": null
+    },
+    {
+      "company": "Freddy's",
+      "location": "Missouri City, TX",
+      "job": "7474661",
+      "status": "SDV",
+      "owner": null
+    },
+    {
+      "company": "Norborne School District",
+      "location": "Norborne, MO",
+      "job": "7475550",
+      "status": "Need to Contact",
+      "owner": null
+    },
+    {
+      "company": "Hawaiian Bros",
+      "location": "Scottsdale, AZ",
+      "job": "6271970",
+      "status": "Rough In",
+      "owner": null
+    },
+    {
+      "company": "Heroes Home Gate",
+      "location": "Kansas City, MO",
+      "job": "5165475",
+      "status": "FS Rough-In",
+      "owner": null
+    },
+    {
+      "company": "Applebee's",
+      "location": "Henderson, NV",
+      "job": "7382146",
+      "status": "Need to Contact",
+      "owner": null
+    },
+    {
+      "company": "Hawaiian Bros",
+      "location": "Norman, OK",
+      "job": "8274699",
+      "status": "Need to Contact",
+      "owner": null
+    },
+    {
+      "company": "Sugar Creek Community",
+      "location": "Frontenac, KS",
+      "job": "7154420",
+      "status": "Need to Contact",
+      "owner": "Triangle Sales"
+    },
+    {
+      "company": "Freddy's",
+      "location": "Gilbert, AZ",
+      "job": "7518748",
+      "status": "Need to Contact",
+      "owner": "Norm Evans"
+    }
+  ]
+}
