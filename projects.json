@@ -1,186 +1,188 @@
 {
   "projects": [
     {
-      "company": "Short Vine",
-      "location": "Cincinnati, OH",
-      "job": "6682010",
-      "status": "Stalled",
-      "coordinator": null
-    },
-    {
-      "company": "Jay's Kitchen",
-      "location": "Cincinnati, OH",
-      "job": "7015441",
-      "status": "Stalled",
-      "coordinator": null
-    },
-    {
-      "company": "Lagman House",
-      "location": "Cincinnati, OH",
-      "job": "7605484",
-      "status": "Stalled",
-      "coordinator": null
-    },
-    {
-      "company": "Concorde (Whetsel Ave)",
-      "location": "Cincinnati, OH",
-      "job": "7623169",
-      "status": "FS Rough-In",
-      "coordinator": null
-    },
-    {
-      "company": "Essen",
-      "location": "Cincinnati, OH",
-      "job": "6703553",
-      "status": "FS Rough-In",
-      "coordinator": null
-    },
-    {
-      "company": "Jack's Place",
-      "location": "Peebles, OH",
-      "job": "7536792",
-      "status": "SDV",
-      "coordinator": null
-    },
-    {
-      "company": "Westfield Collective",
-      "location": "Westfield, IN",
-      "job": "7424506",
-      "status": "Fire Final",
-      "coordinator": null
-    },
-    {
-      "company": "Los Tres Mangos De Michoacan",
-      "location": "Springdale, OH",
-      "job": "7595497",
-      "status": "Upcoming",
-      "coordinator": null
-    },
-    {
-      "company": "Hook Fish N Chicken",
-      "location": "Delhi, OH",
-      "job": "6791780",
-      "status": "Pre-MS Services",
-      "coordinator": null
-    },
-    {
-      "company": "JTs BBQ",
-      "location": "West Union, OH",
-      "job": "7412158",
-      "status": "Need to Contact",
-      "coordinator": null
-    },
-    {
-      "company": "City BBQ",
-      "location": "Murfreesboro, TN",
-      "job": "7564876",
-      "status": "Pre-MS Services",
-      "coordinator": null
-    },
-    {
-      "company": "Sole Mia",
-      "location": "Miami, FL",
-      "job": "7334756",
-      "status": "Pre-MS Services",
-      "coordinator": null
-    },
-    {
-      "company": "Penn Station",
-      "location": "Union, KY",
-      "job": "8225907",
-      "status": "Rough In",
-      "coordinator": null
-    },
-    {
-      "company": "BWW GO",
-      "location": "Teays Valley, WV",
-      "job": "7638513",
-      "status": "Rough In",
-      "coordinator": null
-    },
-    {
-      "company": "Third Street Social",
-      "location": "Olathe, KS",
-      "job": "7623656",
-      "status": "Rough In",
-      "coordinator": null
-    },
-    {
-      "company": "Freddy's",
-      "location": "Galesburg, IL",
-      "job": "7500166",
-      "status": "Need to Contact",
-      "coordinator": null
-    },
-    {
-      "company": "Freddy's",
-      "location": "Fort Gregg Adams, VA",
-      "job": "8169283",
-      "status": "Need to Contact",
-      "coordinator": null
-    },
-    {
-      "company": "Freddy's",
-      "location": "Freehold, NJ",
-      "job": "8367429",
-      "status": "Pre-MS Services",
-      "coordinator": null
-    },
-    {
-      "company": "Freddy's",
-      "location": "Missouri City, TX",
-      "job": "7474661",
-      "status": "SDV",
-      "coordinator": null
-    },
-    {
-      "company": "Norborne School District",
-      "location": "Norborne, MO",
-      "job": "7475550",
-      "status": "Need to Contact",
-      "coordinator": null
+      "company": "Heroes Home Gate",
+      "location": "Kansas City, MO",
+      "job": "5165475",
+      "status": "Unspecified",
+      "owner": "378"
     },
     {
       "company": "Hawaiian Bros",
       "location": "Scottsdale, AZ",
       "job": "6271970",
-      "status": "Rough In",
-      "coordinator": null
+      "status": "Unspecified",
+      "owner": "314"
     },
     {
-      "company": "Heroes Home Gate",
-      "location": "Kansas City, MO",
-      "job": "5165475",
-      "status": "FS Rough-In",
-      "coordinator": null
+      "company": "Short Vine",
+      "location": "Cincinnati, OH",
+      "job": "6682010",
+      "status": "Unspecified",
+      "owner": "361"
     },
     {
-      "company": "Applebee's",
-      "location": "Henderson, NV",
-      "job": "7382146",
-      "status": "Need to Contact",
-      "coordinator": null
+      "company": "Essen",
+      "location": "Cincinnati, OH",
+      "job": "6703553",
+      "status": "Unspecified",
+      "owner": "361"
     },
     {
-      "company": "Hawaiian Bros",
-      "location": "Norman, OK",
-      "job": "8274699",
-      "status": "Need to Contact",
-      "coordinator": null
+      "company": "Hook Fish N Chicken",
+      "location": "Delhi, OH",
+      "job": "6791780",
+      "status": "Unspecified",
+      "owner": "361"
+    },
+    {
+      "company": "Jay's Kitchen",
+      "location": "Cincinnati, OH",
+      "job": "7015441",
+      "status": "Unspecified",
+      "owner": "361"
     },
     {
       "company": "Sugar Creek Community",
       "location": "Frontenac, KS",
       "job": "7154420",
-      "status": "Need to Contact",
-      "coordinator": null
+      "status": "Unspecified",
+      "owner": "344"
+    },
+    {
+      "company": "Sole Mia",
+      "location": "Miami, FL",
+      "job": "7334756",
+      "status": "Unspecified",
+      "owner": ""
+    },
+    {
+      "company": "Applebee's",
+      "location": "Henderson, NV",
+      "job": "7382146",
+      "status": "Unspecified",
+      "owner": "337"
+    },
+    {
+      "company": "JTs BBQ",
+      "location": "West Union, OH",
+      "job": "7412158",
+      "status": "Unspecified",
+      "owner": ""
+    },
+    {
+      "company": "Westfield Collective",
+      "location": "Westfield, IN",
+      "job": "7424506",
+      "status": "Unspecified",
+      "owner": "361"
+    },
+    {
+      "company": "Freddy's",
+      "location": "Missouri City, TX",
+      "job": "7474661",
+      "status": "Unspecified",
+      "owner": ""
+    },
+    {
+      "company": "Norborne School District",
+      "location": "Norborne, MO",
+      "job": "7475550",
+      "status": "Unspecified",
+      "owner": "378"
+    },
+    {
+      "company": "Freddy's",
+      "location": "Galesburg, IL",
+      "job": "7500166",
+      "status": "Unspecified",
+      "owner": "366"
     },
     {
       "company": "Freddy's",
       "location": "Gilbert, AZ",
       "job": "7518748",
-      "status": "Need to Contact",
-      "coordinator": null
+      "status": "Unspecified",
+      "owner": ""
+    },
+    {
+      "company": "Jack's Place",
+      "location": "Peebles, OH",
+      "job": "7536792",
+      "status": "Unspecified",
+      "owner": "361"
+    },
+    {
+      "company": "City BBQ",
+      "location": "Murfreesboro, TN",
+      "job": "7564876",
+      "status": "Unspecified",
+      "owner": ""
+    },
+    {
+      "company": "Los Tres Mangos De Michoacan",
+      "location": "Springdale, OH",
+      "job": "7595497",
+      "status": "Unspecified",
+      "owner": "361"
+    },
+    {
+      "company": "Lagman House",
+      "location": "Cincinnati, OH",
+      "job": "7605484",
+      "status": "Unspecified",
+      "owner": "361"
+    },
+    {
+      "company": "Concorde (Whetsel Ave)",
+      "location": "Cincinnati, OH",
+      "job": "7623169",
+      "status": "Unspecified",
+      "owner": "361"
+    },
+    {
+      "company": "Third Street Social",
+      "location": "Olathe, KS",
+      "job": "7623656",
+      "status": "Unspecified",
+      "owner": "378"
+    },
+    {
+      "company": "BWW GO",
+      "location": "Teays Valley, WV",
+      "job": "7638513",
+      "status": "Unspecified",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Fort Gregg Adams, VA",
+      "job": "8169283",
+      "status": "Unspecified",
+      "owner": "304"
+    },
+    {
+      "company": "Penn Station",
+      "location": "Union, KY",
+      "job": "8225907",
+      "status": "Unspecified",
+      "owner": "361"
+    },
+    {
+      "company": "Hawaiian Bros",
+      "location": "Norman, OK",
+      "job": "8274699",
+      "status": "Unspecified",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Freehold, NJ",
+      "job": "8367429",
+      "status": "Unspecified",
+      "owner": ""
     }
-  ]
+  ],
+  "total": 26,
+  "synced_at": "2026-02-27T08:02:00Z"
 }
