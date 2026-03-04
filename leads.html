@@ -710,8 +710,7 @@
     </div>
 
     <script>
-        const SHEET_ID = '1543222498119556';
-        const GOOGLE_SHEET_ID = '1TY76_jQl2KRuIk-CIUyYd2wzxaMB3w1ki0rpgXP3FyA';
+        const LEADS_SMARTSHEET_ID = '3616288321523588'; // CaptiveAire Leads Pipeline
         const API_KEY = 'AIzaSyB5sTZn5cKkY_UkLAKzx2nWajRd5hGpFZE';
         const STAGES = ['Prospect', 'Qualified', 'Proposed', 'Won'];
         const TERRITORIES = ['Kansas City, MO', 'Cincinnati, OH', 'National', 'Other', 'Austin (Cincinnati)', 'Dan (KC)', 'Joe (Large Cincinnati)', 'Mike (National)'];
@@ -720,51 +719,50 @@
         let allLeads = [];
         let leadsLoaded = false;
 
-        // Fetch leads from Google Sheet
+        // Fetch leads from Smartsheet via Netlify proxy
         async function fetchLeadsFromSheet() {
             try {
-                const response = await fetch(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/Sheet1?key=${API_KEY}`
-                );
+                const response = await fetch('/.netlify/functions/leads');
                 
                 if (!response.ok) {
-                    console.error('Google Sheets API error:', response.status);
+                    console.error('Smartsheet API error:', response.status);
                     loadSampleData();
                     return;
                 }
 
-                const data = await response.json();
-                const rows = data.values || [];
+                const leadsData = await response.json();
                 
-                if (rows.length === 0) {
+                if (!leadsData || leadsData.length === 0) {
                     loadSampleData();
                     return;
                 }
 
-                // Parse rows (skip header)
-                const headers = rows[0];
-                allLeads = rows.slice(1).map(row => ({
-                    company: row[0] || '',
-                    contact: row[1] || '',
-                    email: row[2] || '',
-                    phone: row[3] || '',
-                    territory: row[4] || '',
-                    industry: row[5] || '',
-                    heat: row[6] || 'Cold',
-                    stage: row[7] || 'Prospect',
-                    owner: row[8] || '',
-                    nextSteps: row[9] || '',
+                // Map Smartsheet columns to lead object
+                allLeads = leadsData.map(row => ({
+                    company: row['Company Name'] || '',
+                    contact: row['Primary Contact'] || '',
+                    email: row['Contact Email'] || '',
+                    phone: row['Contact Phone'] || '',
+                    stage: row['Status'] || 'Prospect',
+                    territory: row['Territory'] || '',
+                    notes: row['Notes'] || '',
                     dateAdded: new Date().toISOString().split('T')[0],
-                    notes: ''
+                    // Defaults for UI
+                    industry: '',
+                    heat: 'Warm',
+                    owner: '',
+                    nextSteps: '',
+                    lastContact: '',
+                    dealValue: ''
                 })).filter(lead => lead.company); // Only keep rows with company name
 
                 leadsLoaded = true;
-                console.log(`Loaded ${allLeads.length} leads from Google Sheet`);
+                console.log(`Loaded ${allLeads.length} leads from Smartsheet`);
                 renderBoard();
                 generateReports();
                 document.getElementById('last-sync').textContent = new Date().toLocaleTimeString();
             } catch (error) {
-                console.error('Error fetching from Google Sheets:', error);
+                console.error('Error fetching from Smartsheet:', error);
                 loadSampleData();
             }
         }
