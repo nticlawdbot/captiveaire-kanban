@@ -1,3 +1,5 @@
+
+✅ Parsed 28 projects
 {
   "projects": [
     {
@@ -145,7 +147,7 @@
       "location": "Missouri City, TX",
       "job": "7474661",
       "status": "SDV",
-      "owner": ""
+      "owner": null
     },
     {
       "company": "Norborne School District",
@@ -186,7 +188,7 @@
       "company": "Sugar Creek Community",
       "location": "Frontenac, KS",
       "job": "7154420",
-      "status": "Pre-MS Services",
+      "status": "Rough In",
       "owner": "N/A"
     },
     {
@@ -194,7 +196,7 @@
       "location": "Gilbert, AZ",
       "job": "7518748",
       "status": "Need to Contact",
-      "owner": ""
+      "owner": null
     }
   ]
 }
