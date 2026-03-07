@@ -1,27 +1,18 @@
-
-✅ Parsed 28 projects
 {
   "projects": [
-    {
-      "company": "Short Vine",
-      "location": "Cincinnati, OH",
-      "job": "6682010",
-      "status": "Stalled",
-      "owner": "N/A"
-    },
     {
       "company": "Jay's Kitchen",
       "location": "Cincinnati, OH",
       "job": "7015441",
       "status": "Stalled",
-      "owner": "N/A"
+      "owner": "Mohammad Arabiat"
     },
     {
       "company": "Lagman House",
       "location": "Cincinnati, OH",
       "job": "7605484",
       "status": "Stalled",
-      "owner": "N/A"
+      "owner": "Mohammad Arabiat"
     },
     {
       "company": "Concorde (Whetsel Ave)",
@@ -35,14 +26,14 @@
       "location": "Cincinnati, OH",
       "job": "6703553",
       "status": "FS Rough-In",
-      "owner": "N/A"
+      "owner": "Erik Bentz"
     },
     {
       "company": "Jack's Place",
       "location": "Peebles, OH",
       "job": "7536792",
       "status": "SDV",
-      "owner": "N/A"
+      "owner": "Josh LLoyd"
     },
     {
       "company": "Westfield Collective",
@@ -63,140 +54,149 @@
       "location": "Delhi, OH",
       "job": "6791780",
       "status": "Pre-MS Services",
-      "owner": "N/A"
+      "owner": "Mohammad Arabiat"
     },
     {
       "company": "JTs BBQ",
       "location": "West Union, OH",
       "job": "7412158",
       "status": "Need to Contact",
-      "owner": "N/A"
+      "owner": "Terry Young"
     },
     {
       "company": "City BBQ",
       "location": "Murfreesboro, TN",
       "job": "7564876",
       "status": "Pre-MS Services",
-      "owner": "Jeff Oleski"
+      "owner": ""
     },
     {
       "company": "Sole Mia",
       "location": "Miami, FL",
       "job": "7334756",
       "status": "Need to Contact",
-      "owner": "N/A"
+      "owner": "Jim Bales"
     },
     {
       "company": "Penn Station",
       "location": "Union, KY",
       "job": "8225907",
       "status": "Rough In",
-      "owner": "Jeff Becker"
+      "owner": "Randy w/ C&T"
     },
     {
       "company": "BWW GO",
       "location": "Teays Valley, WV",
       "job": "7638513",
       "status": "Rough In",
-      "owner": "N/A"
+      "owner": ""
     },
     {
       "company": "PopUp Bagels Buckhead",
       "location": "Atlanta, GA",
       "job": "8361344",
       "status": "Pre-MS Services",
-      "owner": "N/A"
+      "owner": "Rajesh Patel"
     },
     {
       "company": "PopUp Bagels Westhampton",
       "location": "Westhampton Beach, NY",
       "job": "8402748",
       "status": "Upcoming",
-      "owner": "N/A"
+      "owner": ""
     },
     {
       "company": "Third Street Social",
       "location": "Olathe, KS",
       "job": "7623656",
       "status": "Rough In",
-      "owner": "N/A"
+      "owner": "Trimark"
     },
     {
       "company": "Freddy's",
       "location": "Galesburg, IL",
       "job": "7500166",
       "status": "Need to Contact",
-      "owner": "Mike Frey"
+      "owner": "Norm Evans"
     },
     {
       "company": "Freddy's",
       "location": "Fort Gregg Adams, VA",
       "job": "8169283",
       "status": "Need to Contact",
-      "owner": "Mike Frey"
+      "owner": "Singer"
     },
     {
       "company": "Freddy's",
       "location": "Freehold, NJ",
       "job": "8367429",
       "status": "Pre-MS Services",
-      "owner": "Mike Frey"
+      "owner": ""
     },
     {
       "company": "Freddy's",
       "location": "Missouri City, TX",
       "job": "7474661",
       "status": "SDV",
-      "owner": null
+      "owner": ""
     },
     {
       "company": "Norborne School District",
       "location": "Norborne, MO",
       "job": "7475550",
       "status": "Need to Contact",
-      "owner": "N/A"
+      "owner": ""
     },
     {
       "company": "Hawaiian Bros",
       "location": "Scottsdale, AZ",
       "job": "6271970",
       "status": "Rough In",
-      "owner": "N/A"
+      "owner": ""
     },
     {
       "company": "Heroes Home Gate",
       "location": "Kansas City, MO",
       "job": "5165475",
       "status": "FS Rough-In",
-      "owner": "N/A"
+      "owner": ""
     },
     {
       "company": "Applebee's",
       "location": "Henderson, NV",
       "job": "7382146",
       "status": "Need to Contact",
-      "owner": "N/A"
+      "owner": ""
     },
     {
       "company": "Hawaiian Bros",
       "location": "Norman, OK",
       "job": "8274699",
       "status": "Need to Contact",
-      "owner": "N/A"
+      "owner": ""
     },
     {
       "company": "Sugar Creek Community",
       "location": "Frontenac, KS",
       "job": "7154420",
       "status": "Rough In",
-      "owner": "N/A"
+      "owner": "Triangle Sales"
+    },
+    {
+      "company": "",
+      "location": "",
+      "job": "7589820",
+      "status": "",
+      "owner": ""
     },
     {
       "company": "Freddy's",
       "location": "Gilbert, AZ",
       "job": "7518748",
       "status": "Need to Contact",
-      "owner": null
+      "owner": ""
     }
-  ]
+  ],
+  "lastSync": "2026-03-07T12:02:00-07:00",
+  "totalProjects": 28
 }
