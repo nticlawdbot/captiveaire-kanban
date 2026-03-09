@@ -743,15 +743,14 @@
                     contact: row['Primary Contact'] || '',
                     email: row['Contact Email'] || '',
                     phone: row['Contact Phone'] || '',
-                    stage: row['Status'] || 'Prospect',
+                    stage: row['Stage'] || 'Prospect',
                     territory: row['Territory'] || '',
+                    industry: row['Industry/Type'] || '',
+                    heat: row['Heat Level'] || 'Warm',
+                    owner: row['Owner'] || '',
+                    nextSteps: row['Next Steps'] || '',
                     notes: row['Notes'] || '',
-                    dateAdded: new Date().toISOString().split('T')[0],
-                    // Defaults for UI
-                    industry: '',
-                    heat: 'Warm',
-                    owner: '',
-                    nextSteps: '',
+                    dateAdded: row['Date Added'] || new Date().toISOString().split('T')[0],
                     lastContact: '',
                     dealValue: ''
                 })).filter(lead => lead.company); // Only keep rows with company name
@@ -959,7 +958,31 @@
                 const response = await fetch('/.netlify/functions/leads');
                 const data = await response.json();
                 
-                if (data.success && data.leads) {
+                // Handle array response (direct from Smartsheet API)
+                if (Array.isArray(data) && data.length > 0) {
+                    allLeads = data.map(row => ({
+                        company: row['Company Name'] || '',
+                        contact: row['Primary Contact'] || '',
+                        email: row['Contact Email'] || '',
+                        phone: row['Contact Phone'] || '',
+                        stage: row['Stage'] || 'Prospect',
+                        territory: row['Territory'] || '',
+                        industry: row['Industry/Type'] || '',
+                        heat: row['Heat Level'] || 'Warm',
+                        owner: row['Owner'] || '',
+                        nextSteps: row['Next Steps'] || '',
+                        notes: row['Notes'] || '',
+                        dateAdded: row['Date Added'] || new Date().toISOString().split('T')[0],
+                        lastContact: '',
+                        dealValue: ''
+                    })).filter(lead => lead.company);
+                    
+                    saveLeads();
+                    renderBoard();
+                    generateReports();
+                    document.getElementById('last-sync').textContent = new Date().toLocaleTimeString();
+                } else if (data.success && data.leads) {
+                    // Legacy support for old format
                     allLeads = data.leads;
                     saveLeads();
                     renderBoard();
@@ -1364,7 +1387,31 @@
             try {
                 const response = await fetch('/.netlify/functions/leads');
                 const data = await response.json();
-                if (data.success && data.leads) {
+                
+                // Handle array response (direct from Smartsheet API)
+                if (Array.isArray(data) && data.length > 0) {
+                    allLeads = data.map(row => ({
+                        company: row['Company Name'] || '',
+                        contact: row['Primary Contact'] || '',
+                        email: row['Contact Email'] || '',
+                        phone: row['Contact Phone'] || '',
+                        stage: row['Stage'] || 'Prospect',
+                        territory: row['Territory'] || '',
+                        industry: row['Industry/Type'] || '',
+                        heat: row['Heat Level'] || 'Warm',
+                        owner: row['Owner'] || '',
+                        nextSteps: row['Next Steps'] || '',
+                        notes: row['Notes'] || '',
+                        dateAdded: row['Date Added'] || new Date().toISOString().split('T')[0],
+                        lastContact: '',
+                        dealValue: ''
+                    })).filter(lead => lead.company);
+                    
+                    renderBoard();
+                    generateReports();
+                    document.getElementById('last-sync').textContent = 'Just now';
+                } else if (data.success && data.leads) {
+                    // Legacy support for old format
                     allLeads = data.leads;
                     renderBoard();
                     generateReports();
