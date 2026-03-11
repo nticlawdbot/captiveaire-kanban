@@ -10,6 +10,7 @@ exports.handler = async (event, context) => {
   if (event.httpMethod === 'POST') {
     try {
       const leadData = JSON.parse(event.body);
+      console.log('📝 Received leadData:', JSON.stringify(leadData));
       
       // Column ID mappings for CaptiveAire Leads Pipeline Smartsheet (8116430953205636)
       const COLUMN_MAP = {
@@ -34,6 +35,7 @@ exports.handler = async (event, context) => {
           });
         }
       }
+      console.log('📍 Built cells:', JSON.stringify(cells));
       
       const payload = {
         rows: [{
