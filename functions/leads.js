@@ -2,8 +2,6 @@
 // Cache bust: 2026-03-11 12:48 - Force function cache refresh for new leads
 const https = require('https');
 
-const https = require('https');
-
 const SMARTSHEET_API_TOKEN = process.env.SMARTSHEET_API_TOKEN || '6Q82Fjy1NKLHhEufhHshTSi5gje1EfmtgXK0D';
 const LEADS_SHEET_ID = process.env.LEADS_SHEET_ID || '8116430953205636';
 
