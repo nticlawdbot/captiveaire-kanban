@@ -6,6 +6,95 @@ const SMARTSHEET_API_TOKEN = process.env.SMARTSHEET_API_TOKEN || '6Q82Fjy1NKLHhE
 const LEADS_SHEET_ID = process.env.LEADS_SHEET_ID || '8116430953205636';
 
 exports.handler = async (event, context) => {
+  // Handle PATCH (update existing lead in Smartsheet)
+  if (event.httpMethod === 'PATCH') {
+    try {
+      const updateData = JSON.parse(event.body);
+      const rowId = updateData.rowId;
+      const updates = updateData.updates; // e.g., { 'Stage': 'Qualified', 'Heat Level': 'Hot' }
+      
+      if (!rowId) {
+        return {
+          statusCode: 400,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Missing rowId' })
+        };
+      }
+
+      // Column ID mappings
+      const COLUMN_MAP = {
+        "Company Name": 70811661324164,
+        "Primary Contact": 4574411288694660,
+        "Contact Email": 2322611475009412,
+        "Contact Phone": 6826211102379908,
+        "Territory": 1196711568166788,
+        "Industry/Type": 5700311195537284,
+        "Heat Level": 3448511381852036,
+        "Stage": 7952111009222532,
+        "Owner": 633761614745476,
+        "Next Steps": 5137361242115972,
+        "Notes": 6503911888785284
+      };
+
+      // Build cells array from updates
+      const cells = [];
+      for (const [fieldName, value] of Object.entries(updates)) {
+        if (COLUMN_MAP[fieldName]) {
+          cells.push({
+            columnId: COLUMN_MAP[fieldName],
+            value: String(value || '')
+          });
+        }
+      }
+
+      if (cells.length === 0) {
+        return {
+          statusCode: 400,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'No valid fields to update' })
+        };
+      }
+
+      console.log(`🔄 Updating row ${rowId} with:`, JSON.stringify(cells));
+
+      // Update the row in Smartsheet
+      const response = await fetch(`https://api.smartsheet.com/2.0/sheets/${LEADS_SHEET_ID}/rows/${rowId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${SMARTSHEET_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ cells: cells })
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('Smartsheet update error:', response.status, error);
+        return {
+          statusCode: response.status,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: `Smartsheet API error: ${response.status}` })
+        };
+      }
+
+      const data = await response.json();
+      console.log('✅ Row updated:', data);
+
+      return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ success: true, message: 'Lead updated successfully', data: data })
+      };
+    } catch (error) {
+      console.error('PATCH error:', error);
+      return {
+        statusCode: 500,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: error.message })
+      };
+    }
+  }
+
   // Handle POST (add new lead to Smartsheet)
   if (event.httpMethod === 'POST') {
     try {
@@ -142,9 +231,9 @@ exports.handler = async (event, context) => {
 
           const sheetData = JSON.parse(data);
 
-          // Transform rows into lead objects
+          // Transform rows into lead objects, including row ID for updates
           const leads = sheetData.rows.map(row => {
-            const lead = {};
+            const lead = { _rowId: row.id }; // Store the Smartsheet row ID
             row.cells.forEach(cell => {
               const col = sheetData.columns.find(c => c.id === cell.columnId);
               if (col) {

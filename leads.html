@@ -737,8 +737,9 @@
                     return;
                 }
 
-                // Map Smartsheet columns to lead object
+                // Map Smartsheet columns to lead object, including row ID
                 allLeads = leadsData.map(row => ({
+                    _rowId: row._rowId || '', // Store Smartsheet row ID for updates
                     company: row['Company Name'] || '',
                     contact: row['Primary Contact'] || '',
                     email: row['Contact Email'] || '',
@@ -961,6 +962,7 @@
                 // Handle array response (direct from Smartsheet API)
                 if (Array.isArray(data) && data.length > 0) {
                     allLeads = data.map(row => ({
+                        _rowId: row._rowId || '',
                         company: row['Company Name'] || '',
                         contact: row['Primary Contact'] || '',
                         email: row['Contact Email'] || '',
@@ -1058,6 +1060,7 @@
             card.className = 'lead-card';
             card.draggable = true;
             card.dataset.company = lead.company;
+            card.dataset.rowId = lead._rowId; // Store row ID for updates
 
             const heatClass = lead.heat.toLowerCase();
 
@@ -1141,41 +1144,71 @@
             
             if (!currentEditingLead) return;
 
-            const originalStage = currentEditingLead.stage;
-            
-            // Update lead
             const leadIndex = allLeads.findIndex(l => l.company === currentEditingLead.company);
-            if (leadIndex !== -1) {
-                allLeads[leadIndex] = {
-                    ...currentEditingLead,
-                    company: document.getElementById('editCompany').value,
-                    contact: document.getElementById('editContact').value,
-                    email: document.getElementById('editEmail').value,
-                    phone: document.getElementById('editPhone').value,
-                    territory: document.getElementById('editTerritory').value,
-                    industry: document.getElementById('editIndustry').value,
-                    heat: document.getElementById('editHeat').value,
-                    stage: document.getElementById('editStage').value,
-                    owner: document.getElementById('editOwner').value,
-                    notes: document.getElementById('editNotes').value
-                };
+            if (leadIndex === -1) return;
 
-                saveLeads();
-                const saveBtn = e.target.querySelector('.save-btn');
-                saveBtn.textContent = '⏳ Saving...';
-                saveBtn.disabled = true;
+            const rowId = allLeads[leadIndex]._rowId;
+            const saveBtn = e.target.querySelector('.save-btn');
+            
+            // Build updates object with changed fields
+            const updatedLead = {
+                company: document.getElementById('editCompany').value,
+                contact: document.getElementById('editContact').value,
+                email: document.getElementById('editEmail').value,
+                phone: document.getElementById('editPhone').value,
+                territory: document.getElementById('editTerritory').value,
+                industry: document.getElementById('editIndustry').value,
+                heat: document.getElementById('editHeat').value,
+                stage: document.getElementById('editStage').value,
+                owner: document.getElementById('editOwner').value,
+                notes: document.getElementById('editNotes').value
+            };
 
-                // Async sync to Google Sheet (non-blocking)
-                syncAllLeadsToSmartsheet().catch(() => {
-                    console.log('Note: Could not sync to sheet, but changes saved locally');
-                });
+            // Update local lead
+            allLeads[leadIndex] = {
+                ...allLeads[leadIndex],
+                ...updatedLead
+            };
 
-                setTimeout(() => {
-                    saveBtn.textContent = '💾 Save Changes';
-                    saveBtn.disabled = false;
-                    showStatusMessage('success', '✅ Lead updated successfully');
-                }, 800);
+            saveLeads();
+            saveBtn.textContent = '⏳ Saving...';
+            saveBtn.disabled = true;
 
+            // Sync all changes to Smartsheet
+            const smartsheetUpdates = {
+                'Company Name': updatedLead.company,
+                'Primary Contact': updatedLead.contact,
+                'Contact Email': updatedLead.email,
+                'Contact Phone': updatedLead.phone,
+                'Territory': updatedLead.territory,
+                'Industry/Type': updatedLead.industry,
+                'Heat Level': updatedLead.heat,
+                'Stage': updatedLead.stage,
+                'Owner': updatedLead.owner,
+                'Notes': updatedLead.notes
+            };
+
+            if (rowId) {
+                updateLeadInSmartsheet(rowId, smartsheetUpdates)
+                    .then(() => {
+                        saveBtn.textContent = '💾 Save Changes';
+                        saveBtn.disabled = false;
+                        showStatusMessage('success', '✅ Lead updated successfully');
+                        renderBoard();
+                        closeEditModal();
+                    })
+                    .catch(err => {
+                        console.error('Failed to sync to Smartsheet:', err);
+                        showStatusMessage('error', '⚠️ Changes saved locally but sync to Smartsheet failed. Please try again.');
+                        saveBtn.textContent = '💾 Save Changes';
+                        saveBtn.disabled = false;
+                    });
+            } else {
+                // No row ID, just save locally
+                console.warn('⚠️ No rowId available for Smartsheet sync');
+                saveBtn.textContent = '💾 Save Changes';
+                saveBtn.disabled = false;
+                showStatusMessage('error', '⚠️ Could not sync to Smartsheet (missing row ID)');
                 renderBoard();
                 closeEditModal();
             }
@@ -1222,6 +1255,7 @@
                     if (!draggedElement) return;
 
                     const leadCompany = draggedElement.dataset.company;
+                    const rowId = draggedElement.dataset.rowId;
                     const leadIndex = allLeads.findIndex(l => l.company === leadCompany);
                     
                     if (leadIndex === -1) return;
@@ -1237,9 +1271,17 @@
                     
                     if (oldStage !== newStage) {
                         saveLeads();
-                        syncAllLeadsToSmartsheet().catch(() => {
-                            console.log('Sync attempted');
-                        });
+                        
+                        // Sync stage change to Smartsheet
+                        if (rowId) {
+                            updateLeadInSmartsheet(rowId, { 'Stage': newStage })
+                                .catch(err => {
+                                    console.error('Failed to sync stage change to Smartsheet:', err);
+                                    // Revert locally
+                                    allLeads[leadIndex].stage = oldStage;
+                                    renderBoard();
+                                });
+                        }
                     }
 
                     renderBoard();
@@ -1391,6 +1433,7 @@
                 // Handle array response (direct from Smartsheet API)
                 if (Array.isArray(data) && data.length > 0) {
                     allLeads = data.map(row => ({
+                        _rowId: row._rowId || '',
                         company: row['Company Name'] || '',
                         contact: row['Primary Contact'] || '',
                         email: row['Contact Email'] || '',
@@ -1542,9 +1585,10 @@
                 
                 // Wait for Smartsheet sync to complete, then reload
                 syncLeadToSmartsheet(leadData)
-                    .then(() => {
+                    .then((response) => {
                         console.log('✅ Lead synced to Smartsheet');
-                        setTimeout(() => location.reload(), 1000); // Reload after 1 second
+                        // Reload after 1 second to fetch the new row with its ID
+                        setTimeout(() => location.reload(), 1000);
                     })
                     .catch(err => {
                         console.error('Failed to sync to Smartsheet:', err);
@@ -1576,6 +1620,40 @@
                 return Promise.resolve(data);
             } catch (e) {
                 console.error('❌ Sync failed:', e.message);
+                return Promise.reject(e);
+            }
+        }
+
+        async function updateLeadInSmartsheet(rowId, updates) {
+            // Update existing lead in Smartsheet via PATCH
+            if (!rowId) {
+                console.warn('⚠️ No rowId provided for update');
+                return Promise.reject(new Error('Missing rowId'));
+            }
+
+            try {
+                const response = await fetch('/.netlify/functions/leads', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        rowId: rowId,
+                        updates: updates
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    console.error('❌ Update error:', response.status, error);
+                    return Promise.reject(new Error(`HTTP ${response.status}: ${error.error || 'Unknown error'}`));
+                }
+                
+                const data = await response.json();
+                console.log('✅ Lead updated in Smartsheet:', data);
+                return Promise.resolve(data);
+            } catch (e) {
+                console.error('❌ Update failed:', e.message);
                 return Promise.reject(e);
             }
         }
