@@ -79,12 +79,12 @@ exports.handler = async (event, context) => {
       });
       
       if (!updateResponse.ok) {
-        const error = await updateResponse.text();
-        console.error('Smartsheet update error:', updateResponse.status, error);
+        const error = await updateResponse.json();
+        console.error('Smartsheet update error:', updateResponse.status, JSON.stringify(error));
         return {
           statusCode: updateResponse.status,
           headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: `Smartsheet update failed: ${updateResponse.status}` })
+          body: JSON.stringify({ error: `Smartsheet update failed: ${updateResponse.status}`, details: error })
         };
       }
       
