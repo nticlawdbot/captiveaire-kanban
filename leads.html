@@ -1169,7 +1169,8 @@
             saveBtn.textContent = '⏳ Saving...';
             saveBtn.disabled = true;
 
-            // Sync all changes to Smartsheet (Notes column doesn't exist in Smartsheet)
+            // Sync all changes to Smartsheet
+            // Note: Owner is CONTACT type (read-only via API), Notes doesn't exist
             const smartsheetUpdates = {
                 'Company Name': updatedLead.company,
                 'Primary Contact': updatedLead.contact,
@@ -1178,9 +1179,8 @@
                 'Territory': updatedLead.territory,
                 'Industry/Type': updatedLead.industry,
                 'Heat Level': updatedLead.heat,
-                'Stage': updatedLead.stage,
-                'Owner': updatedLead.owner
-                // Note: 'Notes' column does not exist in Smartsheet, excluded from updates
+                'Stage': updatedLead.stage
+                // SKIP: Owner (CONTACT type, read-only), Notes (doesn't exist)
             };
 
             if (rowId) {
@@ -1544,9 +1544,8 @@
                     'Territory': document.getElementById('territory').value,
                     'Industry/Type': document.getElementById('industry').value,
                     'Heat Level': document.getElementById('heat').value,
-                    'Stage': 'Prospect',
-                    'Owner': document.getElementById('territory').value
-                    // Only include fields that exist in Smartsheet
+                    'Stage': 'Prospect'
+                    // SKIP: Owner is CONTACT type (read-only), Territory is for filtering only
                 };
                 
                 // Add to local kanban storage

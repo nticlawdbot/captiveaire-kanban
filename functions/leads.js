@@ -22,6 +22,7 @@ exports.handler = async (event, context) => {
       }
 
       // Column ID mappings (from Smartsheet - verified 2026-03-11)
+      // IMPORTANT: Owner is a CONTACT type column - cannot be set via API
       const COLUMN_MAP = {
         "Company Name": 70811661324164,
         "Primary Contact": 4574411288694660,
@@ -31,9 +32,9 @@ exports.handler = async (event, context) => {
         "Industry/Type": 5700311195537284,
         "Heat Level": 3448511381852036,
         "Stage": 7952111009222532,
-        "Owner": 633761614745476,
         "Next Steps": 5137361242115972
-        // NOTE: "Notes" column does not exist in Smartsheet, removed from COLUMN_MAP
+        // SKIP: "Owner" (633761614745476) - CONTACT type, read-only via API
+        // SKIP: "Notes" - column does not exist in Smartsheet
       };
 
       // Build cells array from updates
@@ -117,7 +118,8 @@ exports.handler = async (event, context) => {
       console.log('📝 Received leadData:', JSON.stringify(leadData));
       
       // Column ID mappings for CaptiveAire Leads Pipeline Smartsheet (8116430953205636)
-      // Verified 2026-03-11: These are the only columns that exist in the sheet
+      // Verified 2026-03-11: Only includes columns that can be set via API
+      // IMPORTANT: Owner (633761614745476) is CONTACT type - cannot be set via API
       const COLUMN_MAP = {
         "Company Name": 70811661324164,
         "Primary Contact": 4574411288694660,
@@ -128,6 +130,7 @@ exports.handler = async (event, context) => {
         "Heat Level": 3448511381852036,
         "Stage": 7952111009222532,
         "Next Steps": 5137361242115972
+        // SKIP: Owner - CONTACT type, read-only via API
       };
       
       const cells = [];
