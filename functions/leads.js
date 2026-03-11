@@ -13,6 +13,7 @@ exports.handler = async (event, context) => {
       console.log('📝 Received leadData:', JSON.stringify(leadData));
       
       // Column ID mappings for CaptiveAire Leads Pipeline Smartsheet (8116430953205636)
+      // NOTE: "Owner" column (633761614745476) is CONTACT type and cannot be set via API
       const COLUMN_MAP = {
         "Company Name": 70811661324164,
         "Primary Contact": 4574411288694660,
@@ -22,8 +23,8 @@ exports.handler = async (event, context) => {
         "Industry/Type": 5700311195537284,
         "Heat Level": 3448511381852036,
         "Stage": 7952111009222532,
-        "Next Steps": 5137361242115972,
-        "Owner": 633761614745476
+        "Next Steps": 5137361242115972
+        // SKIP "Owner" - it's a CONTACT type column (cannot be set via API)
       };
       
       const cells = [];
