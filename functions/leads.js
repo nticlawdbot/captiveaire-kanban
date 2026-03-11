@@ -1,5 +1,5 @@
 // Netlify Function: Fetch leads from Smartsheet
-// Cache bust: 2026-03-09 15:05 - Smartsheet data corrected, all leads now have Stage = Prospect
+// Cache bust: 2026-03-11 12:48 - Force function cache refresh for new leads
 const https = require('https');
 
 const SMARTSHEET_API_TOKEN = process.env.SMARTSHEET_API_TOKEN || '6Q82Fjy1NKLHhEufhHshTSi5gje1EfmtgXK0D';
