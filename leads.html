@@ -696,10 +696,6 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Notes</label>
-                    <textarea id="editNotes"></textarea>
-                </div>
                 <div class="modal-buttons">
                     <button type="submit" class="modal-btn save-btn">💾 Save Changes</button>
                     <button type="button" class="modal-btn cancel-btn" onclick="closeEditModal()">Cancel</button>
@@ -1102,7 +1098,6 @@
             document.getElementById('editHeat').value = lead.heat;
             document.getElementById('editStage').value = lead.stage;
             document.getElementById('editOwner').value = lead.owner;
-            document.getElementById('editNotes').value = lead.notes || '';
             document.getElementById('statusMessage').innerHTML = '';
             document.getElementById('statusMessage').className = 'status-message';
             document.getElementById('editLeadModal').style.display = 'block';
@@ -1160,8 +1155,8 @@
                 industry: document.getElementById('editIndustry').value,
                 heat: document.getElementById('editHeat').value,
                 stage: document.getElementById('editStage').value,
-                owner: document.getElementById('editOwner').value,
-                notes: document.getElementById('editNotes').value
+                owner: document.getElementById('editOwner').value
+                // Notes field excluded - Notes column doesn't exist in Smartsheet
             };
 
             // Update local lead
@@ -1174,7 +1169,7 @@
             saveBtn.textContent = '⏳ Saving...';
             saveBtn.disabled = true;
 
-            // Sync all changes to Smartsheet
+            // Sync all changes to Smartsheet (Notes column doesn't exist in Smartsheet)
             const smartsheetUpdates = {
                 'Company Name': updatedLead.company,
                 'Primary Contact': updatedLead.contact,
@@ -1184,8 +1179,8 @@
                 'Industry/Type': updatedLead.industry,
                 'Heat Level': updatedLead.heat,
                 'Stage': updatedLead.stage,
-                'Owner': updatedLead.owner,
-                'Notes': updatedLead.notes
+                'Owner': updatedLead.owner
+                // Note: 'Notes' column does not exist in Smartsheet, excluded from updates
             };
 
             if (rowId) {
@@ -1523,10 +1518,6 @@
                             <label>Industry/Type</label>
                             <input type="text" id="industry" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
                         </div>
-                        <div style="margin-bottom:15px;">
-                            <label>Notes</label>
-                            <textarea id="notes" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; height:80px;"></textarea>
-                        </div>
                         <div style="display:flex; gap:10px;">
                             <button type="submit" style="flex:1; background:#FF5722; color:white; padding:10px; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">
                                 Add Lead & Sync to Smartsheet
@@ -1554,10 +1545,8 @@
                     'Industry/Type': document.getElementById('industry').value,
                     'Heat Level': document.getElementById('heat').value,
                     'Stage': 'Prospect',
-                    'Owner': document.getElementById('territory').value,
-                    'Date Added': new Date().toISOString().split('T')[0],
-                    'Notes': document.getElementById('notes').value,
-                    'Source': 'Manual Entry'
+                    'Owner': document.getElementById('territory').value
+                    // Only include fields that exist in Smartsheet
                 };
                 
                 // Add to local kanban storage
@@ -1633,6 +1622,8 @@
                 return Promise.reject(new Error('Missing rowId'));
             }
 
+            console.log('🔄 Updating row', rowId, 'with:', JSON.stringify(updates));
+
             try {
                 const response = await fetch('/.netlify/functions/leads', {
                     method: 'PATCH',
@@ -1645,13 +1636,13 @@
                     })
                 });
                 
+                const data = await response.json();
+                
                 if (!response.ok) {
-                    const error = await response.json();
-                    console.error('❌ Update error:', response.status, error);
-                    return Promise.reject(new Error(`HTTP ${response.status}: ${error.error || 'Unknown error'}`));
+                    console.error('❌ Update error:', response.status, JSON.stringify(data));
+                    return Promise.reject(new Error(`HTTP ${response.status}: ${data.error || 'Unknown error'}`));
                 }
                 
-                const data = await response.json();
                 console.log('✅ Lead updated in Smartsheet:', data);
                 return Promise.resolve(data);
             } catch (e) {
@@ -1677,10 +1668,8 @@
                         'Industry/Type': lead.industry,
                         'Heat Level': lead.heat,
                         'Stage': lead.stage,
-                        'Owner': lead.owner,
-                        'Date Added': lead.dateAdded,
-                        'Notes': lead.notes,
-                        'Source': lead.source
+                        'Owner': lead.owner
+                        // Exclude Notes and Source - not in Smartsheet
                     };
                 }
                 console.log('✅ All leads synced');
