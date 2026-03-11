@@ -1181,9 +1181,10 @@
                 allLeads = allLeads.filter(l => l.company !== companyName);
                 saveLeads();
                 closeEditModal();
-                renderBoard();
                 
+                // Show success and reload page to refresh from Smartsheet
                 showStatusMessage('success', `✅ "${companyName}" deleted successfully`);
+                setTimeout(() => location.reload(), 1500);
             } catch (error) {
                 console.error('Delete error:', error);
                 showStatusMessage('error', '⚠️ Failed to delete lead: ' + error.message);
