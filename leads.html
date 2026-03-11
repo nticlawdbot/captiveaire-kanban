@@ -957,13 +957,13 @@
             btn.textContent = '⏳ Syncing leads...';
 
             try {
-                // First, save current local data (notes and owner) before fetching new data
-                const currentLocalData = {};
+                // First, save current local notes before fetching new data
+                // Owner now syncs with Smartsheet, only notes stay local
+                const currentNotes = {};
                 allLeads.forEach(lead => {
-                    currentLocalData[lead.company] = {
-                        notes: lead.notes || '',
-                        owner: lead.owner || ''
-                    };
+                    if (lead.notes) {
+                        currentNotes[lead.company] = lead.notes;
+                    }
                 });
 
                 const response = await fetch('/.netlify/functions/leads');
@@ -989,18 +989,12 @@
                             dealValue: ''
                         };
                         
-                        // PRESERVE local-only fields (notes and owner) when syncing
-                        if (currentLocalData[newLead.company]) {
-                            if (currentLocalData[newLead.company].notes) {
-                                newLead.notes = currentLocalData[newLead.company].notes;
-                            }
-                            if (currentLocalData[newLead.company].owner) {
-                                newLead.owner = currentLocalData[newLead.company].owner;
-                            }
+                        // PRESERVE local notes only (owner syncs from Smartsheet now)
+                        if (currentNotes[newLead.company]) {
+                            newLead.notes = currentNotes[newLead.company];
+                        } else {
+                            newLead.notes = '';
                         }
-                        
-                        if (!newLead.notes) newLead.notes = '';
-                        if (!newLead.owner) newLead.owner = '';
                         
                         return newLead;
                     }).filter(lead => lead.company);
@@ -1202,7 +1196,8 @@
             saveBtn.disabled = true;
 
             // Sync all changes to Smartsheet
-            // Note: Owner is CONTACT type (read-only via API), Notes doesn't exist
+            // Owner is now PICKLIST type (can be synced)
+            // Notes stays local-only (doesn't exist in Smartsheet)
             const smartsheetUpdates = {
                 'Company Name': updatedLead.company,
                 'Primary Contact': updatedLead.contact,
@@ -1211,8 +1206,9 @@
                 'Territory': updatedLead.territory,
                 'Industry/Type': updatedLead.industry,
                 'Heat Level': updatedLead.heat,
-                'Stage': updatedLead.stage
-                // SKIP: Owner (CONTACT type, read-only), Notes (doesn't exist)
+                'Stage': updatedLead.stage,
+                'Owner': updatedLead.owner
+                // SKIP: Notes (local-only, doesn't exist in Smartsheet)
             };
 
             if (rowId) {
@@ -1494,18 +1490,13 @@
                             dealValue: ''
                         };
 
-                        // PRESERVE local-only fields from localStorage (notes and owner)
-                        if (localLeads[smartsheetLead.company]) {
-                            if (localLeads[smartsheetLead.company].notes) {
-                                smartsheetLead.notes = localLeads[smartsheetLead.company].notes;
-                            }
-                            if (localLeads[smartsheetLead.company].owner) {
-                                smartsheetLead.owner = localLeads[smartsheetLead.company].owner;
-                            }
+                        // PRESERVE local-only fields from localStorage (notes only)
+                        // Owner now syncs with Smartsheet (PICKLIST type)
+                        if (localLeads[smartsheetLead.company] && localLeads[smartsheetLead.company].notes) {
+                            smartsheetLead.notes = localLeads[smartsheetLead.company].notes;
+                        } else {
+                            smartsheetLead.notes = '';
                         }
-                        
-                        if (!smartsheetLead.notes) smartsheetLead.notes = '';
-                        if (!smartsheetLead.owner) smartsheetLead.owner = '';
 
                         return smartsheetLead;
                     }).filter(lead => lead.company);
@@ -1607,8 +1598,8 @@
                     'Territory': document.getElementById('territory').value,
                     'Industry/Type': document.getElementById('industry').value,
                     'Heat Level': document.getElementById('heat').value,
-                    'Stage': 'Prospect'
-                    // SKIP: Owner is CONTACT type (read-only), Territory is for filtering only
+                    'Stage': 'Prospect',
+                    'Owner': document.getElementById('territory').value
                 };
                 
                 // Add to local kanban storage
