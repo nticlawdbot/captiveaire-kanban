@@ -56,6 +56,7 @@ exports.handler = async (event, context) => {
       }
 
       console.log(`🔄 Updating row ${rowId} with:`, JSON.stringify(cells));
+      console.log(`📝 Request body:`, JSON.stringify({ cells: cells }));
 
       // Update the row in Smartsheet
       const response = await fetch(`https://api.smartsheet.com/2.0/sheets/${LEADS_SHEET_ID}/rows/${rowId}`, {
@@ -67,17 +68,31 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({ cells: cells })
       });
 
+      const responseText = await response.text();
+      console.log(`📊 Smartsheet response status: ${response.status}`);
+      console.log(`📊 Smartsheet response body:`, responseText);
+
       if (!response.ok) {
-        const error = await response.text();
-        console.error('Smartsheet update error:', response.status, error);
+        console.error('❌ Smartsheet update failed:', response.status, responseText);
         return {
           statusCode: response.status,
           headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: `Smartsheet API error: ${response.status}` })
+          body: JSON.stringify({ error: `Smartsheet API error: ${response.status}`, details: responseText })
         };
       }
 
-      const data = await response.json();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Failed to parse response:', e);
+        return {
+          statusCode: 500,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Failed to parse Smartsheet response' })
+        };
+      }
+
       console.log('✅ Row updated:', data);
 
       return {
