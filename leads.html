@@ -1271,6 +1271,7 @@
                     
                     if (oldStage !== newStage) {
                         saveLeads();
+                        renderBoard(); // Show change immediately
                         
                         // Sync stage change to Smartsheet
                         if (rowId) {
@@ -1279,12 +1280,13 @@
                                     console.error('Failed to sync stage change to Smartsheet:', err);
                                     // Revert locally
                                     allLeads[leadIndex].stage = oldStage;
+                                    saveLeads();
                                     renderBoard();
                                 });
+                        } else {
+                            console.warn('⚠️ No rowId for lead, sync skipped');
                         }
                     }
-
-                    renderBoard();
                 });
             });
         }
