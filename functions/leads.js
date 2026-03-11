@@ -6,6 +6,80 @@ const SMARTSHEET_API_TOKEN = process.env.SMARTSHEET_API_TOKEN || '6Q82Fjy1NKLHhE
 const LEADS_SHEET_ID = process.env.LEADS_SHEET_ID || '8116430953205636';
 
 exports.handler = async (event, context) => {
+  // Handle POST (add new lead to Smartsheet)
+  if (event.httpMethod === 'POST') {
+    try {
+      const leadData = JSON.parse(event.body);
+      
+      // Column ID mappings for CaptiveAire Leads Pipeline Smartsheet (8116430953205636)
+      const COLUMN_MAP = {
+        "Company Name": 70811661324164,
+        "Primary Contact": 4574411288694660,
+        "Contact Email": 2322611475009412,
+        "Contact Phone": 6826211102379908,
+        "Territory": 1196711568166788,
+        "Industry/Type": 5700311195537284,
+        "Heat Level": 3448511381852036,
+        "Stage": 7952111009222532,
+        "Next Steps": 5137361242115972,
+        "Owner": 633761614745476
+      };
+      
+      const cells = [];
+      for (const [fieldName, value] of Object.entries(leadData)) {
+        if (COLUMN_MAP[fieldName]) {
+          cells.push({
+            columnId: COLUMN_MAP[fieldName],
+            value: String(value || '')
+          });
+        }
+      }
+      
+      const payload = {
+        rows: [{
+          toBottom: true,
+          cells: cells
+        }]
+      };
+      
+      const response = await fetch(`https://api.smartsheet.com/2.0/sheets/${LEADS_SHEET_ID}/rows`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${SMARTSHEET_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('Smartsheet error:', response.status, error);
+        return {
+          statusCode: response.status,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: `Smartsheet API error: ${response.status}` })
+        };
+      }
+      
+      const data = await response.json();
+      console.log('✅ Lead added to Smartsheet:', data);
+      
+      return {
+        statusCode: 201,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ success: true, message: 'Lead added successfully', data: data })
+      };
+    } catch (error) {
+      console.error('POST error:', error);
+      return {
+        statusCode: 500,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: error.message })
+      };
+    }
+  }
+
+  // Handle GET (fetch leads from Smartsheet)
   return new Promise((resolve, reject) => {
     const options = {
       hostname: 'api.smartsheet.com',

@@ -1555,60 +1555,27 @@
         }
 
         async function syncLeadToSmartsheet(leadData) {
-            const SHEET_ID = '8116430953205636';  // Smartsheet - CaptiveAire Leads Pipeline
-            const TOKEN = '6Q82Fjy1NKLHhEufhHshTSi5gje1EfmtgXK0D';
-            
-            // Column ID mappings for CaptiveAire Leads Pipeline Smartsheet (8116430953205636)
-            const COLUMN_MAP = {
-                "Company Name": 70811661324164,
-                "Primary Contact": 4574411288694660,
-                "Contact Email": 2322611475009412,
-                "Contact Phone": 6826211102379908,
-                "Territory": 1196711568166788,
-                "Industry/Type": 5700311195537284,
-                "Heat Level": 3448511381852036,
-                "Stage": 7952111009222532,
-                "Next Steps": 5137361242115972,
-                "Owner": 633761614745476
-            };
-            
-            const cells = [];
-            for (const [fieldName, value] of Object.entries(leadData)) {
-                if (COLUMN_MAP[fieldName]) {
-                    cells.push({
-                        columnId: COLUMN_MAP[fieldName],
-                        value: String(value)
-                    });
-                }
-            }
-            
-            const payload = {
-                rows: [{
-                    toBottom: true,
-                    cells: cells
-                }]
-            };
-            
+            // Use Netlify function to add lead (avoids CORS issues)
             try {
-                const response = await fetch(`https://api.smartsheet.com/2.0/sheets/${SHEET_ID}/rows`, {
+                const response = await fetch('/.netlify/functions/leads', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${TOKEN}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(leadData)
                 });
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('✅ Lead synced to Smartsheet:', data);
-                    return Promise.resolve(data);
-                } else {
-                    console.error('❌ Smartsheet API error:', response.status);
-                    return Promise.reject(new Error(`HTTP ${response.status}`));
+                if (!response.ok) {
+                    const error = await response.json();
+                    console.error('❌ Netlify function error:', response.status, error);
+                    return Promise.reject(new Error(`HTTP ${response.status}: ${error.error || 'Unknown error'}`));
                 }
+                
+                const data = await response.json();
+                console.log('✅ Lead synced to Smartsheet:', data);
+                return Promise.resolve(data);
             } catch (e) {
-                console.error('❌ Smartsheet sync failed:', e.message);
+                console.error('❌ Sync failed:', e.message);
                 return Promise.reject(e);
             }
         }
