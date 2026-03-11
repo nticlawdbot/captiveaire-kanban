@@ -1617,7 +1617,7 @@
                     dateAdded: leadData['Date Added'],
                     lastContact: '',
                     dealValue: '',
-                    notes: leadData['Notes'],
+                    notes: '',
                     source: 'Manual Entry'
                 });
                 saveLeads();
@@ -1627,10 +1627,30 @@
                 document.getElementById('leadModal').style.display = 'none';
                 document.getElementById('leadModal').remove();
                 
-                // Wait for Smartsheet sync to complete, then reload
+                // Wait for Smartsheet sync to complete, then trigger research and reload
                 syncLeadToSmartsheet(leadData)
                     .then((response) => {
                         console.log('✅ Lead synced to Smartsheet');
+                        
+                        // Trigger Pete research for new lead
+                        console.log('🔍 Triggering Pete research for:', leadData['Company Name']);
+                        fetch('/.netlify/functions/trigger-research', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                companyName: leadData['Company Name'],
+                                contact: leadData['Primary Contact'],
+                                territory: leadData['Territory']
+                            })
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            console.log('✅ Research triggered:', data.message);
+                        })
+                        .catch(err => {
+                            console.warn('Could not trigger research:', err);
+                        });
+                        
                         // Reload after 1 second to fetch the new row with its ID
                         setTimeout(() => location.reload(), 1000);
                     })
