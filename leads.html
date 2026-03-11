@@ -957,28 +957,46 @@
             btn.textContent = '⏳ Syncing leads...';
 
             try {
+                // First, save current notes before fetching new data
+                const currentNotes = {};
+                allLeads.forEach(lead => {
+                    if (lead.notes) {
+                        currentNotes[lead.company] = lead.notes;
+                    }
+                });
+
                 const response = await fetch('/.netlify/functions/leads');
                 const data = await response.json();
                 
                 // Handle array response (direct from Smartsheet API)
                 if (Array.isArray(data) && data.length > 0) {
-                    allLeads = data.map(row => ({
-                        _rowId: row._rowId || '',
-                        company: row['Company Name'] || '',
-                        contact: row['Primary Contact'] || '',
-                        email: row['Contact Email'] || '',
-                        phone: row['Contact Phone'] || '',
-                        stage: row['Stage'] || 'Prospect',
-                        territory: row['Territory'] || '',
-                        industry: row['Industry/Type'] || '',
-                        heat: row['Heat Level'] || 'Warm',
-                        owner: row['Owner'] || '',
-                        nextSteps: row['Next Steps'] || '',
-                        notes: row['Notes'] || '',
-                        dateAdded: row['Date Added'] || new Date().toISOString().split('T')[0],
-                        lastContact: '',
-                        dealValue: ''
-                    })).filter(lead => lead.company);
+                    allLeads = data.map(row => {
+                        const newLead = {
+                            _rowId: row._rowId || '',
+                            company: row['Company Name'] || '',
+                            contact: row['Primary Contact'] || '',
+                            email: row['Contact Email'] || '',
+                            phone: row['Contact Phone'] || '',
+                            stage: row['Stage'] || 'Prospect',
+                            territory: row['Territory'] || '',
+                            industry: row['Industry/Type'] || '',
+                            heat: row['Heat Level'] || 'Warm',
+                            owner: row['Owner'] || '',
+                            nextSteps: row['Next Steps'] || '',
+                            dateAdded: row['Date Added'] || new Date().toISOString().split('T')[0],
+                            lastContact: '',
+                            dealValue: ''
+                        };
+                        
+                        // PRESERVE local notes when syncing
+                        if (currentNotes[newLead.company]) {
+                            newLead.notes = currentNotes[newLead.company];
+                        } else {
+                            newLead.notes = '';
+                        }
+                        
+                        return newLead;
+                    }).filter(lead => lead.company);
                     
                     saveLeads();
                     renderBoard();
@@ -1431,28 +1449,53 @@
         // Load data on page load via Netlify function
         async function initializeLeads() {
             try {
+                // First, load any locally saved data
+                let localLeads = {};
+                try {
+                    const saved = localStorage.getItem('allLeads');
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        // Index by company name for quick lookup
+                        parsed.forEach(lead => {
+                            localLeads[lead.company] = lead;
+                        });
+                    }
+                } catch (e) {
+                    console.warn('Could not parse local leads:', e);
+                }
+
                 const response = await fetch('/.netlify/functions/leads');
                 const data = await response.json();
                 
                 // Handle array response (direct from Smartsheet API)
                 if (Array.isArray(data) && data.length > 0) {
-                    allLeads = data.map(row => ({
-                        _rowId: row._rowId || '',
-                        company: row['Company Name'] || '',
-                        contact: row['Primary Contact'] || '',
-                        email: row['Contact Email'] || '',
-                        phone: row['Contact Phone'] || '',
-                        stage: row['Stage'] || 'Prospect',
-                        territory: row['Territory'] || '',
-                        industry: row['Industry/Type'] || '',
-                        heat: row['Heat Level'] || 'Warm',
-                        owner: row['Owner'] || '',
-                        nextSteps: row['Next Steps'] || '',
-                        notes: row['Notes'] || '',
-                        dateAdded: row['Date Added'] || new Date().toISOString().split('T')[0],
-                        lastContact: '',
-                        dealValue: ''
-                    })).filter(lead => lead.company);
+                    allLeads = data.map(row => {
+                        const smartsheetLead = {
+                            _rowId: row._rowId || '',
+                            company: row['Company Name'] || '',
+                            contact: row['Primary Contact'] || '',
+                            email: row['Contact Email'] || '',
+                            phone: row['Contact Phone'] || '',
+                            stage: row['Stage'] || 'Prospect',
+                            territory: row['Territory'] || '',
+                            industry: row['Industry/Type'] || '',
+                            heat: row['Heat Level'] || 'Warm',
+                            owner: row['Owner'] || '',
+                            nextSteps: row['Next Steps'] || '',
+                            dateAdded: row['Date Added'] || new Date().toISOString().split('T')[0],
+                            lastContact: '',
+                            dealValue: ''
+                        };
+
+                        // PRESERVE local notes from localStorage
+                        if (localLeads[smartsheetLead.company] && localLeads[smartsheetLead.company].notes) {
+                            smartsheetLead.notes = localLeads[smartsheetLead.company].notes;
+                        } else {
+                            smartsheetLead.notes = '';
+                        }
+
+                        return smartsheetLead;
+                    }).filter(lead => lead.company);
                     
                     renderBoard();
                     generateReports();

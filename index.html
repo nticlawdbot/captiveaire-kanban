@@ -813,9 +813,10 @@
         async function loadProjectsData() {
             const projects = await fetchProjectsFromSmartsheet();
             
-            // CRITICAL FIX: Update card data but PRESERVE column positions!
+            // CRITICAL FIX: Update card data but PRESERVE column positions and owner assignments!
             // Smartsheet data (status, dates, contacts) is source of truth
             // But kanban column position (Week 4, Week 2, etc.) is user's manual choice
+            // And owner assignment is CONTACT type in Smartsheet (read-only via API) - preserve local assignments
             // Don't reorganize cards based on status—keep them where user placed them
             
             projects.forEach(freshProject => {
@@ -834,6 +835,7 @@
                 if (existingCard && existingColumnKey) {
                     // Update existing card with fresh data from Smartsheet
                     // BUT keep it in the column the user placed it in
+                    // AND preserve the local owner assignment (Coordinator is read-only in Smartsheet)
                     // IMPORTANT: Don't overwrite status - that's controlled by card column position
                     existingCard.company = freshProject.company;
                     existingCard.location = freshProject.location;
@@ -848,7 +850,8 @@
                     existingCard.sdv = freshProject.sdv;
                     existingCard.fireSystemService = freshProject.fireSystemService;
                     existingCard.fsNumber = freshProject.fsNumber;
-                    existingCard.owner = freshProject.owner;
+                    // PRESERVE local owner - don't overwrite with Smartsheet (Coordinator is CONTACT type, read-only)
+                    // existingCard.owner stays as user set it, not overwritten by Smartsheet
                 } else {
                     // New project from Smartsheet (doesn't exist in kanban yet)
                     // Place it in column based on status

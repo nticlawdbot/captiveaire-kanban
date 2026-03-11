@@ -98,7 +98,7 @@ exports.handler = async (event, context) => {
   if (event.httpMethod === 'PUT') {
     try {
       const data = JSON.parse(event.body);
-      let { rowId, company, location, status, turnoverDate, siteContact, siteContactPhone, siteContactEmail, fireFinal, sdv, fireSystemService, hoodShipDate, fsNumber } = data;
+      let { rowId, company, location, status, turnoverDate, siteContact, siteContactPhone, siteContactEmail, fireFinal, sdv, fireSystemService, hoodShipDate, fsNumber, coordinator } = data;
 
       if (!rowId) {
         return {
