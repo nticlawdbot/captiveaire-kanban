@@ -1535,15 +1535,22 @@
                 });
                 saveLeads();
                 
-                // Attempt to sync to Google Sheets (non-blocking)
-                syncLeadToSmartsheet(leadData).catch(err => {
-                    console.log('Note: Could not sync to Google Sheet, but lead was added to kanban');
-                });
-                
+                // Show loading message while syncing to Smartsheet
+                alert('✅ Lead saved locally. Syncing to Smartsheet...');
                 document.getElementById('leadModal').style.display = 'none';
                 document.getElementById('leadModal').remove();
-                alert('✅ Lead added to Kanban board!');
-                location.reload();
+                
+                // Wait for Smartsheet sync to complete, then reload
+                syncLeadToSmartsheet(leadData)
+                    .then(() => {
+                        console.log('✅ Lead synced to Smartsheet');
+                        setTimeout(() => location.reload(), 1000); // Reload after 1 second
+                    })
+                    .catch(err => {
+                        console.error('Failed to sync to Smartsheet:', err);
+                        alert('⚠️ Lead added to kanban but sync to Smartsheet failed. Reloading...');
+                        setTimeout(() => location.reload(), 1000);
+                    });
             });
         }
 
@@ -1593,10 +1600,16 @@
                 });
                 
                 if (response.ok) {
-                    console.log('✅ Lead synced to Smartsheet');
+                    const data = await response.json();
+                    console.log('✅ Lead synced to Smartsheet:', data);
+                    return Promise.resolve(data);
+                } else {
+                    console.error('❌ Smartsheet API error:', response.status);
+                    return Promise.reject(new Error(`HTTP ${response.status}`));
                 }
             } catch (e) {
-                console.log('⚠️ Sync attempted');
+                console.error('❌ Smartsheet sync failed:', e.message);
+                return Promise.reject(e);
             }
         }
 
