@@ -44,32 +44,57 @@ exports.handler = async (event, context) => {
         }]
       };
       
-      const response = await fetch(`https://api.smartsheet.com/2.0/sheets/${LEADS_SHEET_ID}/rows`, {
+      // First, create the empty row
+      const createResponse = await fetch(`https://api.smartsheet.com/2.0/sheets/${LEADS_SHEET_ID}/rows`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${SMARTSHEET_API_TOKEN}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ rows: [{ toBottom: true }] })
       });
       
-      if (!response.ok) {
-        const error = await response.text();
-        console.error('Smartsheet error:', response.status, error);
+      if (!createResponse.ok) {
+        const error = await createResponse.text();
+        console.error('Smartsheet create error:', createResponse.status, error);
         return {
-          statusCode: response.status,
+          statusCode: createResponse.status,
           headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: `Smartsheet API error: ${response.status}` })
+          body: JSON.stringify({ error: `Smartsheet API error: ${createResponse.status}` })
         };
       }
       
-      const data = await response.json();
-      console.log('✅ Lead added to Smartsheet:', data);
+      const createData = await createResponse.json();
+      const newRowId = createData.result.id;
+      console.log('✅ Row created:', newRowId);
+      
+      // Now update the row with the actual values
+      const updateResponse = await fetch(`https://api.smartsheet.com/2.0/sheets/${LEADS_SHEET_ID}/rows/${newRowId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${SMARTSHEET_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ cells: cells })
+      });
+      
+      if (!updateResponse.ok) {
+        const error = await updateResponse.text();
+        console.error('Smartsheet update error:', updateResponse.status, error);
+        return {
+          statusCode: updateResponse.status,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: `Smartsheet update failed: ${updateResponse.status}` })
+        };
+      }
+      
+      const updateData = await updateResponse.json();
+      console.log('✅ Lead values saved to Smartsheet:', updateData);
       
       return {
         statusCode: 201,
         headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ success: true, message: 'Lead added successfully', data: data })
+        body: JSON.stringify({ success: true, message: 'Lead added successfully', data: updateData })
       };
     } catch (error) {
       console.error('POST error:', error);
