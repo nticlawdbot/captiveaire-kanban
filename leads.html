@@ -957,12 +957,13 @@
             btn.textContent = '⏳ Syncing leads...';
 
             try {
-                // First, save current notes before fetching new data
-                const currentNotes = {};
+                // First, save current local data (notes and owner) before fetching new data
+                const currentLocalData = {};
                 allLeads.forEach(lead => {
-                    if (lead.notes) {
-                        currentNotes[lead.company] = lead.notes;
-                    }
+                    currentLocalData[lead.company] = {
+                        notes: lead.notes || '',
+                        owner: lead.owner || ''
+                    };
                 });
 
                 const response = await fetch('/.netlify/functions/leads');
@@ -988,12 +989,18 @@
                             dealValue: ''
                         };
                         
-                        // PRESERVE local notes when syncing
-                        if (currentNotes[newLead.company]) {
-                            newLead.notes = currentNotes[newLead.company];
-                        } else {
-                            newLead.notes = '';
+                        // PRESERVE local-only fields (notes and owner) when syncing
+                        if (currentLocalData[newLead.company]) {
+                            if (currentLocalData[newLead.company].notes) {
+                                newLead.notes = currentLocalData[newLead.company].notes;
+                            }
+                            if (currentLocalData[newLead.company].owner) {
+                                newLead.owner = currentLocalData[newLead.company].owner;
+                            }
                         }
+                        
+                        if (!newLead.notes) newLead.notes = '';
+                        if (!newLead.owner) newLead.owner = '';
                         
                         return newLead;
                     }).filter(lead => lead.company);
@@ -1449,7 +1456,7 @@
         // Load data on page load via Netlify function
         async function initializeLeads() {
             try {
-                // First, load any locally saved data
+                // First, load any locally saved data (notes and owner are local-only)
                 let localLeads = {};
                 try {
                     const saved = localStorage.getItem('allLeads');
@@ -1487,12 +1494,18 @@
                             dealValue: ''
                         };
 
-                        // PRESERVE local notes from localStorage
-                        if (localLeads[smartsheetLead.company] && localLeads[smartsheetLead.company].notes) {
-                            smartsheetLead.notes = localLeads[smartsheetLead.company].notes;
-                        } else {
-                            smartsheetLead.notes = '';
+                        // PRESERVE local-only fields from localStorage (notes and owner)
+                        if (localLeads[smartsheetLead.company]) {
+                            if (localLeads[smartsheetLead.company].notes) {
+                                smartsheetLead.notes = localLeads[smartsheetLead.company].notes;
+                            }
+                            if (localLeads[smartsheetLead.company].owner) {
+                                smartsheetLead.owner = localLeads[smartsheetLead.company].owner;
+                            }
                         }
+                        
+                        if (!smartsheetLead.notes) smartsheetLead.notes = '';
+                        if (!smartsheetLead.owner) smartsheetLead.owner = '';
 
                         return smartsheetLead;
                     }).filter(lead => lead.company);
