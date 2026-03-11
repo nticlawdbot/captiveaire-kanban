@@ -1135,18 +1135,61 @@
             document.getElementById('editLeadForm').reset();
         }
 
-        function deleteLead() {
+        async function deleteLead() {
             if (!currentEditingLead) return;
             if (!confirm(`Delete "${currentEditingLead.company}"? This cannot be undone.`)) {
                 return;
             }
             
-            allLeads = allLeads.filter(l => l.company !== currentEditingLead.company);
-            saveLeads();
-            closeEditModal();
-            renderBoard();
-            syncAllLeadsToSmartsheet();
-            showStatusMessage('success', '✅ Lead deleted successfully');
+            const rowId = currentEditingLead._rowId;
+            const companyName = currentEditingLead.company;
+            
+            // Show loading
+            const deleteBtn = document.querySelector('.delete-btn');
+            const originalText = deleteBtn.textContent;
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = '⏳ Deleting...';
+
+            try {
+                // Delete from Smartsheet first
+                if (rowId) {
+                    console.log(`🗑️ Deleting row ${rowId} from Smartsheet`);
+                    const response = await fetch('/.netlify/functions/leads', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ rowId: rowId })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        console.error('Delete failed:', data.error);
+                        showStatusMessage('error', `⚠️ Failed to delete from Smartsheet: ${data.error}`);
+                        deleteBtn.disabled = false;
+                        deleteBtn.textContent = originalText;
+                        return;
+                    }
+
+                    console.log('✅ Lead deleted from Smartsheet');
+                } else {
+                    console.warn('⚠️ No rowId, deleting locally only');
+                }
+
+                // Remove from local kanban
+                allLeads = allLeads.filter(l => l.company !== companyName);
+                saveLeads();
+                closeEditModal();
+                renderBoard();
+                
+                showStatusMessage('success', `✅ "${companyName}" deleted successfully`);
+            } catch (error) {
+                console.error('Delete error:', error);
+                showStatusMessage('error', '⚠️ Failed to delete lead: ' + error.message);
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = originalText;
+            }
         }
 
         function showStatusMessage(type, message) {

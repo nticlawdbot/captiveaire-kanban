@@ -2,10 +2,63 @@
 // Cache bust: 2026-03-11 12:48 - Force function cache refresh for new leads
 const https = require('https');
 
+const https = require('https');
+
 const SMARTSHEET_API_TOKEN = process.env.SMARTSHEET_API_TOKEN || '6Q82Fjy1NKLHhEufhHshTSi5gje1EfmtgXK0D';
 const LEADS_SHEET_ID = process.env.LEADS_SHEET_ID || '8116430953205636';
 
 exports.handler = async (event, context) => {
+  // Handle DELETE (delete lead from Smartsheet)
+  if (event.httpMethod === 'DELETE') {
+    try {
+      const data = JSON.parse(event.body);
+      const rowId = data.rowId;
+
+      if (!rowId) {
+        return {
+          statusCode: 400,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Missing rowId' })
+        };
+      }
+
+      console.log(`🗑️ Deleting row ${rowId} from Smartsheet`);
+
+      const deleteResponse = await fetch(`https://api.smartsheet.com/2.0/sheets/${LEADS_SHEET_ID}/rows/${rowId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${SMARTSHEET_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!deleteResponse.ok) {
+        const error = await deleteResponse.text();
+        console.error('Smartsheet delete error:', deleteResponse.status, error);
+        return {
+          statusCode: deleteResponse.status,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: `Smartsheet API error: ${deleteResponse.status}` })
+        };
+      }
+
+      console.log('✅ Row deleted from Smartsheet');
+
+      return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ success: true, message: 'Lead deleted successfully', rowId: rowId })
+      };
+    } catch (error) {
+      console.error('DELETE error:', error);
+      return {
+        statusCode: 500,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: error.message })
+      };
+    }
+  }
+
   // Handle PATCH (update existing lead in Smartsheet)
   if (event.httpMethod === 'PATCH') {
     try {
