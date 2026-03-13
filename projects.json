@@ -1,284 +1,209 @@
 {
   "projects": [
     {
-      "company": "X",
-      "location": "CINCINNATI:",
-      "job": "LOCAL",
-      "status": "",
+      "company": "Short Vine",
+      "location": "Cincinnati, OH",
+      "job": "6682010",
+      "status": "Stalled",
       "owner": ""
     },
     {
-      "company": "",
-      "location": "Short Vine",
-      "job": "Cincinnati, OH",
-      "status": 6682010.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Jay's Kitchen",
-      "job": "Cincinnati, OH",
-      "status": 7015441.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Lagman House",
-      "job": "Cincinnati, OH",
-      "status": 7605484.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Concorde (Whetsel Ave)",
-      "job": "Cincinnati, OH",
-      "status": 7623169.0,
-      "owner": "Yes ✅"
-    },
-    {
-      "company": "",
-      "location": "LaRosa's (Big Ash Brew)",
-      "job": "Cincinnati, OH",
-      "status": "",
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Essen",
-      "job": "Cincinnati, OH",
-      "status": 6703553.0,
-      "owner": "Yes ✅"
-    },
-    {
-      "company": "",
-      "location": "Jack's Place",
-      "job": "Peebles, OH",
-      "status": 7536792.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Westfield Collective",
-      "job": "Westfield, IN",
-      "status": 7424506.0,
-      "owner": "Yes ✅"
-    },
-    {
-      "company": "",
-      "location": "Los Tres Mangos De Michoacan",
-      "job": "Springdale, OH",
-      "status": 7595497.0,
-      "owner": "Yes ✅"
-    },
-    {
-      "company": "",
-      "location": "Hook Fish N Chicken",
-      "job": "Delhi, OH",
-      "status": 6791780.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "JTs BBQ",
-      "job": "West Union, OH",
-      "status": 7412158.0,
-      "owner": "No"
-    },
-    {
-      "company": "X",
-      "location": "CINCINNATI:",
-      "job": "OUT OF TOWN",
-      "status": "",
+      "company": "Jay's Kitchen",
+      "location": "Cincinnati, OH",
+      "job": "7015441",
+      "status": "Stalled",
       "owner": ""
     },
     {
-      "company": "",
-      "location": "City BBQ",
-      "job": "Murfreesboro, TN",
-      "status": 7564876.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Sole Mia",
-      "job": "Miami, FL",
-      "status": 7334756.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "PopUp Bagels (Gulch)",
-      "job": "Nashville, TN",
-      "status": "",
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "PopUp Bagels",
-      "job": "Georgetown D.C",
-      "status": "",
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "PopUp Bagels",
-      "job": "Ardmore, PA",
-      "status": "",
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Penn Station",
-      "job": "Union, KY",
-      "status": 8225907.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "BWW GO",
-      "job": "Teays Valley, WV",
-      "status": 7638513.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "PopUp Bagels Buckhead",
-      "job": "Atlanta, GA",
-      "status": 8361344.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "PopUp Bagels Westhampton",
-      "job": "Westhampton Beach, NY",
-      "status": 8402748.0,
+      "company": "Lagman House",
+      "location": "Cincinnati, OH",
+      "job": "7605484",
+      "status": "Stalled",
       "owner": ""
     },
     {
-      "company": "",
-      "location": "PopUp Bagels Garden City",
-      "job": "Garden City, NY",
-      "status": "",
+      "company": "Concorde (Whetsel Ave)",
+      "location": "Cincinnati, OH",
+      "job": "7623169",
+      "status": "FS Rough-In",
       "owner": ""
     },
     {
-      "company": "",
-      "location": "PopUp Bagels Huntington Station",
-      "job": "Huntington Station, NY",
-      "status": "",
+      "company": "Essen",
+      "location": "Cincinnati, OH",
+      "job": "6703553",
+      "status": "FS Rough-In",
       "owner": ""
     },
     {
-      "company": "X",
-      "location": "KANSAS CITY:",
-      "job": "HIGH PRIORITY",
-      "status": "",
+      "company": "Jack's Place",
+      "location": "Peebles, OH",
+      "job": "7536792",
+      "status": "SDV",
       "owner": ""
     },
     {
-      "company": "",
-      "location": "Third Street Social",
-      "job": "Olathe, KS",
-      "status": 7623656.0,
-      "owner": "No"
-    },
-    {
-      "company": "X",
-      "location": "KANSAS CITY:",
-      "job": "FREDDY'S",
-      "status": "",
+      "company": "Westfield Collective",
+      "location": "Westfield, IN",
+      "job": "7424506",
+      "status": "Fire Final",
       "owner": ""
     },
     {
-      "company": "",
-      "location": "Freddy's",
-      "job": "Galesburg, IL",
-      "status": 7500166.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Freddy's",
-      "job": "Fort Gregg Adams, VA",
-      "status": 8169283.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Freddy's",
-      "job": "Freehold, NJ",
-      "status": 8367429.0,
+      "company": "Los Tres Mangos De Michoacan",
+      "location": "Springdale, OH",
+      "job": "7595497",
+      "status": "Upcoming",
       "owner": ""
     },
     {
-      "company": "",
-      "location": "Freddy's",
-      "job": "Missouri City, TX",
-      "status": 7474661.0,
+      "company": "Hook Fish N Chicken",
+      "location": "Delhi, OH",
+      "job": "6791780",
+      "status": "Pre-MS Services",
       "owner": ""
     },
     {
-      "company": "X",
-      "location": "KANSAS CITY:",
-      "job": "REGULAR",
-      "status": "",
+      "company": "JTs BBQ",
+      "location": "West Union, OH",
+      "job": "7412158",
+      "status": "Need to Contact",
       "owner": ""
     },
     {
-      "company": "",
-      "location": "Norborne School District",
-      "job": "Norborne, MO",
-      "status": 7475550.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Hawaiian Bros",
-      "job": "Scottsdale, AZ",
-      "status": 6271970.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Heroes Home Gate",
-      "job": "Kansas City, MO",
-      "status": 5165475.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Applebee's",
-      "job": "Henderson, NV",
-      "status": 7382146.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Hawaiian Bros",
-      "job": "Norman, OK",
-      "status": 8274699.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Sugar Creek Community",
-      "job": "Frontenac, KS",
-      "status": 7154420.0,
-      "owner": "No"
-    },
-    {
-      "company": "",
-      "location": "Basehor-Linwood Learning Center",
-      "job": "Basehor, KS",
-      "status": 7668085.0,
+      "company": "City BBQ",
+      "location": "Murfreesboro, TN",
+      "job": "7564876",
+      "status": "Pre-MS Services",
       "owner": ""
     },
     {
-      "company": "",
-      "location": "Freddy's",
-      "job": "Gilbert, AZ",
-      "status": "7518748",
+      "company": "Sole Mia",
+      "location": "Miami, FL",
+      "job": "7334756",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Penn Station",
+      "location": "Union, KY",
+      "job": "8225907",
+      "status": "Rough In",
+      "owner": ""
+    },
+    {
+      "company": "BWW GO",
+      "location": "Teays Valley, WV",
+      "job": "7638513",
+      "status": "Rough In",
+      "owner": ""
+    },
+    {
+      "company": "PopUp Bagels Buckhead",
+      "location": "Atlanta, GA",
+      "job": "8361344",
+      "status": "Pre-MS Services",
+      "owner": ""
+    },
+    {
+      "company": "PopUp Bagels Westhampton",
+      "location": "Westhampton Beach, NY",
+      "job": "8402748",
+      "status": "Upcoming",
+      "owner": ""
+    },
+    {
+      "company": "Third Street Social",
+      "location": "Olathe, KS",
+      "job": "7623656",
+      "status": "Rough In",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Galesburg, IL",
+      "job": "7500166",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Fort Gregg Adams, VA",
+      "job": "8169283",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Freehold, NJ",
+      "job": "8367429",
+      "status": "Pre-MS Services",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Missouri City, TX",
+      "job": "7474661",
+      "status": "SDV",
+      "owner": ""
+    },
+    {
+      "company": "Norborne School District",
+      "location": "Norborne, MO",
+      "job": "7475550",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Hawaiian Bros",
+      "location": "Scottsdale, AZ",
+      "job": "6271970",
+      "status": "Rough In",
+      "owner": ""
+    },
+    {
+      "company": "Heroes Home Gate",
+      "location": "Kansas City, MO",
+      "job": "5165475",
+      "status": "FS Rough-In",
+      "owner": ""
+    },
+    {
+      "company": "Applebee's",
+      "location": "Henderson, NV",
+      "job": "7382146",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Hawaiian Bros",
+      "location": "Norman, OK",
+      "job": "8274699",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Sugar Creek Community",
+      "location": "Frontenac, KS",
+      "job": "7154420",
+      "status": "Pre-MS Services",
+      "owner": ""
+    },
+    {
+      "company": "Basehor-Linwood Learning Center",
+      "location": "Basehor, KS",
+      "job": "7668085",
+      "status": "Need to Contact",
+      "owner": ""
+    },
+    {
+      "company": "Freddy's",
+      "location": "Gilbert, AZ",
+      "job": "7518748",
+      "status": "Need to Contact",
       "owner": ""
     }
-  ]
+  ],
+  "synced_count": 29,
+  "timestamp": "2026-03-13T12:05:00Z"
 }
