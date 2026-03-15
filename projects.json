@@ -1,3 +1,7 @@
+
+
+=== SYNC COMPLETE ===
+Total projects synced: 29
 {
   "projects": [
     {
@@ -54,7 +58,7 @@
       "location": "Springdale, OH",
       "job": "7595497",
       "status": "Upcoming",
-      "owner": "N/A"
+      "owner": null
     },
     {
       "company": "Hook Fish N Chicken",
@@ -75,7 +79,7 @@
       "location": "Murfreesboro, TN",
       "job": "7564876",
       "status": "Pre-MS Services",
-      "owner": ""
+      "owner": null
     },
     {
       "company": "Sole Mia",
@@ -96,7 +100,7 @@
       "location": "Teays Valley, WV",
       "job": "7638513",
       "status": "Rough In",
-      "owner": ""
+      "owner": null
     },
     {
       "company": "PopUp Bagels Buckhead",
@@ -180,7 +184,7 @@
       "location": "Norman, OK",
       "job": "8274699",
       "status": "Need to Contact",
-      "owner": ""
+      "owner": null
     },
     {
       "company": "Sugar Creek Community",
@@ -203,7 +207,5 @@
       "status": "Need to Contact",
       "owner": "Norm Evans"
     }
-  ],
-  "synced_at": "2026-03-15T06:03:00Z",
-  "total": 29
+  ]
 }
