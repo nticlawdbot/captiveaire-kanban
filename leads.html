@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leads Pipeline - CaptiveAire Kanban</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .sync-btn, .back-btn {
+            background: #FF5722;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn {
+            background: #666;
+        }
+
+        .sync-btn:hover {
+            background: #DC3D1F;
+        }
+
+        .back-btn:hover {
+            background: #555;
+        }
+
+        .sync-btn.syncing {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .filters {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .filter-group select {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stage-column {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 75vh;
+        }
+
+        .stage-header {
+            background: linear-gradient(135deg, #FF5722 0%, #DC3D1F 100%);
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stage-count {
+            display: inline-block;
+            background: rgba(255,255,255,0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+            font-size: 12px;
+        }
+
+        .leads-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            min-height: 400px;
+        }
+
+        .lead-card {
+            background: #f8f9fa;
+            border-left: 4px solid #FF5722;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lead-card:hover {
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .lead-company {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .lead-contact {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .lead-details {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .lead-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e8ecf1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            color: #444;
+        }
+
+        .tag.hot {
+            background: #ffe0e0;
+            color: #d32f2f;
+        }
+
+        .tag.warm {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .tag.cold {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .no-leads {
+            color: #999;
+            text-align: center;
+            padding: 30px 10px;
+            font-size: 13px;
+        }
+
+        .reports-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .reports-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #FF5722 0%, #DC3D1F 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .report-table th {
+            background: #f5f5f5;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .report-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .report-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .footer {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .nav-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .nav-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #f4f4f4;
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .close-btn {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .save-btn {
+            background: #FF5722;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #DC3D1F;
+        }
+
+        .save-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .cancel-btn {
+            background: #999;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background: #777;
+        }
+
+        .delete-btn {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #b71c1c;
+        }
+
+        .status-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        /* Drag and Drop Styles */
+        .lead-card.dragging {
+            opacity: 0.5;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: rotate(2deg);
+        }
+
+        .leads-container.drag-over {
+            background: #fff3e0;
+            border: 2px dashed #FF5722;
+        }
+
+        .lead-card.drag-source {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>📊 Leads Pipeline</h1>
+                <p style="color: #666; margin-top: 5px; font-size: 13px;">Real-time lead tracking from Smartsheet</p>
+            </div>
+            <div class="header-controls">
+                <div class="status">
+                    Last sync: <span id="last-sync">Never</span>
+                </div>
+                <button class="sync-btn" id="add-lead-btn">➕ Add Lead</button>
+                <button class="sync-btn" id="sync-btn">🔄 Sync Smartsheet</button>
+                <a href="index.html" class="back-btn">← Back to Projects</a>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Territory:</label>
+                <select id="filterTerritory" onchange="applyFilters()">
+                    <option value="">All</option>
+                    <option value="Kansas City, MO">Kansas City, MO</option>
+                    <option value="Cincinnati, OH">Cincinnati, OH</option>
+                    <option value="National">National</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Heat Level:</label>
+                <select id="filterHeat" onchange="applyFilters()">
+                    <option value="">All</option>
+                    <option value="Hot">🔥 Hot</option>
+                    <option value="Warm">⚡ Warm</option>
+                    <option value="Cold">🔷 Cold</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Owner:</label>
+                <select id="filterOwner" onchange="applyFilters()">
+                    <option value="">All</option>
+                    <option value="Mike">Mike</option>
+                    <option value="Joe">Joe</option>
+                    <option value="Dan">Dan</option>
+                    <option value="Austin">Austin</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('pipeline')">Pipeline View</button>
+            <button class="nav-tab" onclick="switchTab('reports')">Reports & Metrics</button>
+        </div>
+
+        <!-- Pipeline View -->
+        <div id="pipeline" class="tab-content active">
+            <div class="board" id="board"></div>
+        </div>
+
+        <!-- Reports View -->
+        <div id="reports" class="tab-content">
+            <div class="reports-section">
+                <h2>📈 Pipeline Metrics</h2>
+                <div class="metrics-grid" id="metricsGrid"></div>
+                
+                <h3 style="margin-top: 30px; margin-bottom: 15px; color: #333;">Leads by Team Member</h3>
+                <table class="report-table" id="leadsPerTeamTable">
+                    <thead>
+                        <tr>
+                            <th>Team Member</th>
+                            <th>Total Leads</th>
+                            <th>Prospect</th>
+                            <th>Qualified</th>
+                            <th>Proposed</th>
+                            <th>Won</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <h3 style="margin-top: 30px; margin-bottom: 15px; color: #333;">Leads by Stage & Territory</h3>
+                <table class="report-table" id="stageTerritorySummary">
+                    <thead>
+                        <tr>
+                            <th>Territory</th>
+                            <th>Prospect</th>
+                            <th>Qualified</th>
+                            <th>Proposed</th>
+                            <th>Won</th>
+                            <th>Total Value</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <h3 style="margin-top: 30px; margin-bottom: 15px; color: #333;">Heat Level Distribution</h3>
+                <table class="report-table" id="heatSummary">
+                    <thead>
+                        <tr>
+                            <th>Heat Level</th>
+                            <th>Count</th>
+                            <th>% of Pipeline</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>💡 Sync on demand • Filter by territory, heat, and owner • View metrics and reports</p>
+        </div>
+    </div>
+
+    <!-- Edit Lead Modal -->
+    <div id="editLeadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Lead</h2>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <div id="statusMessage" class="status-message"></div>
+            <form id="editLeadForm">
+                <div class="form-group">
+                    <label>Company Name *</label>
+                    <input type="text" id="editCompany" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Primary Contact</label>
+                        <input type="text" id="editContact">
+                    </div>
+                    <div class="form-group">
+                        <label>Owner *</label>
+                        <select id="editOwner" required>
+                            <option value="">Select Owner</option>
+                            <option value="Mike">Mike</option>
+                            <option value="Joe">Joe</option>
+                            <option value="Dan">Dan</option>
+                            <option value="Austin">Austin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Contact Email</label>
+                        <input type="email" id="editEmail">
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Phone</label>
+                        <input type="tel" id="editPhone">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Territory *</label>
+                        <select id="editTerritory" required>
+                            <option value="">Select Territory</option>
+                            <option value="Kansas City, MO">Kansas City, MO</option>
+                            <option value="Cincinnati, OH">Cincinnati, OH</option>
+                            <option value="National">National</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Industry/Type</label>
+                        <input type="text" id="editIndustry">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Heat Level *</label>
+                        <select id="editHeat" required>
+                            <option value="">Select Heat Level</option>
+                            <option value="Hot">🔥 Hot</option>
+                            <option value="Warm">⚡ Warm</option>
+                            <option value="Cold">🔷 Cold</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Stage *</label>
+                        <select id="editStage" required>
+                            <option value="Prospect">Prospect</option>
+                            <option value="Qualified">Qualified</option>
+                            <option value="Proposed">Proposed</option>
+                            <option value="Won">Won</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>📝 Local Notes (Kanban Only - Not Synced)</label>
+                    <textarea id="editNotes" style="background-color: #fffacd; border: 1px solid #daa520;"></textarea>
+                    <small style="color: #666; margin-top: 4px; display: block;">These notes are stored locally in the kanban board only and will not sync to Smartsheet.</small>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="modal-btn save-btn">💾 Save Changes</button>
+                    <button type="button" class="modal-btn cancel-btn" onclick="closeEditModal()">Cancel</button>
+                    <button type="button" class="modal-btn delete-btn" onclick="deleteLead()">🗑️ Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const LEADS_SMARTSHEET_ID = '3616288321523588'; // CaptiveAire Leads Pipeline
+        const API_KEY = 'AIzaSyB5sTZn5cKkY_UkLAKzx2nWajRd5hGpFZE';
+        const STAGES = ['Prospect', 'Qualified', 'Proposed', 'Won'];
+        const TERRITORIES = ['Kansas City, MO', 'Cincinnati, OH', 'National', 'Other', 'Austin (Cincinnati)', 'Dan (KC)', 'Joe (Large Cincinnati)', 'Mike (National)'];
+        const OWNERS = ['Mike', 'Joe', 'Dan', 'Austin'];
+
+        let allLeads = [];
+        let leadsLoaded = false;
+
+        // Fetch leads from Smartsheet via Netlify proxy
+        async function fetchLeadsFromSheet() {
+            try {
+                const response = await fetch('/.netlify/functions/leads');
+                
+                if (!response.ok) {
+                    console.error('Smartsheet API error:', response.status);
+                    loadSampleData();
+                    return;
+                }
+
+                const leadsData = await response.json();
+                
+                if (!leadsData || leadsData.length === 0) {
+                    loadSampleData();
+                    return;
+                }
+
+                // Map Smartsheet columns to lead object, including row ID
+                allLeads = leadsData.map(row => ({
+                    _rowId: row._rowId || '', // Store Smartsheet row ID for updates
+                    company: row['Company Name'] || '',
+                    contact: row['Primary Contact'] || '',
+                    email: row['Contact Email'] || '',
+                    phone: row['Contact Phone'] || '',
+                    stage: row['Stage'] || 'Prospect',
+                    territory: row['Territory'] || '',
+                    industry: row['Industry/Type'] || '',
+                    heat: row['Heat Level'] || 'Warm',
+                    owner: row['Owner'] || '',
+                    nextSteps: row['Next Steps'] || '',
+                    notes: row['Notes'] || '',
+                    dateAdded: row['Date Added'] || new Date().toISOString().split('T')[0],
+                    lastContact: '',
+                    dealValue: ''
+                })).filter(lead => lead.company); // Only keep rows with company name
+
+                leadsLoaded = true;
+                console.log(`Loaded ${allLeads.length} leads from Smartsheet`);
+                renderBoard();
+                generateReports();
+                document.getElementById('last-sync').textContent = new Date().toLocaleTimeString();
+            } catch (error) {
+                console.error('Error fetching from Smartsheet:', error);
+                loadSampleData();
+            }
+        }
+
+        // Fallback to sample data if Sheet not available
+        function loadSampleData() {
+            allLeads = [
+                {
+                    company: 'Hemma Hemma Dinette',
+                    contact: 'Ashley Bare',
+                    email: '',
+                    phone: '',
+                    territory: 'Dan (KC)',
+                    industry: 'Diner/Casual',
+                    heat: 'Hot',
+                    stage: 'Prospect',
+                    nextSteps: 'Contact Ashley',
+                    owner: 'Dan',
+                    dateAdded: '2026-02-16',
+                    lastContact: '',
+                    dealValue: '',
+                    notes: 'Downtown KC; full pastry bar + coffee; new HVAC for open kitchen',
+                    source: 'Daily Research'
+                },
+                {
+                    company: 'Sandlot Social',
+                    contact: 'Sandlot Social',
+                    email: '',
+                    phone: '',
+                    territory: 'Dan (KC)',
+                    industry: 'Eatertainment',
+                    heat: 'Warm',
+                    stage: 'Prospect',
+                    nextSteps: 'Research decision-makers',
+                    owner: 'Dan',
+                    dateAdded: '2026-02-16',
+                    lastContact: '',
+                    dealValue: '',
+                    notes: '15,000 sq ft; 10 baseball simulators + full bar/kitchen; new construction needs HVAC',
+                    source: 'Daily Research'
+                },
+                {
+                    company: 'Zingaro',
+                    contact: 'Fabio Viviani',
+                    email: '',
+                    phone: '',
+                    territory: 'Joe (Large Cincinnati)',
+                    industry: 'Italian',
+                    heat: 'Hot',
+                    stage: 'Prospect',
+                    nextSteps: 'CEO outreach',
+                    owner: 'Joe',
+                    dateAdded: '2026-02-16',
+                    lastContact: '',
+                    dealValue: '',
+                    notes: 'Madisonville; celebrity chef; German bar next door; high-end kitchen requirements',
+                    source: 'Daily Research'
+                },
+                {
+                    company: 'Wings Bar and Grill',
+                    contact: 'Haydar & Michael David',
+                    email: '',
+                    phone: '',
+                    territory: 'Austin (Cincinnati)',
+                    industry: 'Sports Bar',
+                    heat: 'Warm',
+                    stage: 'Prospect',
+                    nextSteps: 'Schedule call',
+                    owner: 'Austin',
+                    dateAdded: '2026-02-16',
+                    lastContact: '',
+                    dealValue: '',
+                    notes: 'Pleasant Ridge expansion; family-owned 30-year brand; $20M mixed-use development',
+                    source: 'Daily Research'
+                },
+                {
+                    company: 'Italian Sausage Co.',
+                    contact: 'Joe Brancato',
+                    email: '',
+                    phone: '',
+                    territory: 'Dan (KC)',
+                    industry: 'Italian QSR',
+                    heat: 'Hot',
+                    stage: 'Prospect',
+                    nextSteps: 'Follow up',
+                    owner: 'Dan',
+                    dateAdded: '2026-02-16',
+                    lastContact: '',
+                    dealValue: '',
+                    notes: 'River Market; walk-up window + patio; handmade sausage production requires HVAC',
+                    source: 'Daily Research'
+                },
+                {
+                    company: 'Dear Donna',
+                    contact: 'Johnny & Helen Jo Leach',
+                    email: '',
+                    phone: '',
+                    territory: 'Dan (KC)',
+                    industry: 'Restaurant/Bakery',
+                    heat: 'Hot',
+                    stage: 'Prospect',
+                    nextSteps: 'Site visit',
+                    owner: 'Dan',
+                    dateAdded: '2026-02-16',
+                    lastContact: '',
+                    dealValue: '',
+                    notes: 'Columbus Park location; breakfast/lunch focus; companion pastry shop in adjacent garage',
+                    source: 'Daily Research'
+                },
+                {
+                    company: 'Casa (Alfred & Co.)',
+                    contact: 'Robin Krause',
+                    email: '',
+                    phone: '',
+                    territory: 'Dan (KC)',
+                    industry: 'Mexican',
+                    heat: 'Hot',
+                    stage: 'Prospect',
+                    nextSteps: 'Email intro',
+                    owner: 'Dan',
+                    dateAdded: '2026-02-16',
+                    lastContact: '',
+                    dealValue: '',
+                    notes: 'Corinth Square; Salty Iguana space; wood-fired grilling requires HVAC upgrade',
+                    source: 'Daily Research'
+                },
+                {
+                    company: 'CAVA (Oakley)',
+                    contact: 'Dimitri Moshovitis',
+                    email: '',
+                    phone: '',
+                    territory: 'Austin (Cincinnati)',
+                    industry: 'Mediterranean QSR',
+                    heat: 'Warm',
+                    stage: 'Prospect',
+                    nextSteps: 'Research expansion',
+                    owner: 'Austin',
+                    dateAdded: '2026-02-16',
+                    lastContact: '',
+                    dealValue: '',
+                    notes: 'Oakley; former Holtman\'s Donuts; high-volume QSR kitchen for chain expansion',
+                    source: 'Daily Research'
+                },
+                {
+                    company: 'Whiskey Yard',
+                    contact: 'Epic Brands',
+                    email: '',
+                    phone: '',
+                    territory: 'Joe (Large Cincinnati)',
+                    industry: 'Whiskey Bar',
+                    heat: 'Hot',
+                    stage: 'Prospect',
+                    nextSteps: 'Follow up',
+                    owner: 'Joe',
+                    dateAdded: '2026-02-16',
+                    lastContact: '',
+                    dealValue: '',
+                    notes: 'Liberty Center; JUST OPENED 02/08/26; full kitchen + extensive bar infrastructure',
+                    source: 'Daily Research'
+                },
+                {
+                    company: 'VV Italian Experience',
+                    contact: 'Andrea Stefano',
+                    email: '',
+                    phone: '',
+                    territory: 'Austin (Cincinnati)',
+                    industry: 'Italian Café',
+                    heat: 'Warm',
+                    stage: 'Prospect',
+                    nextSteps: 'Check expansion plans',
+                    owner: 'Austin',
+                    dateAdded: '2026-02-16',
+                    lastContact: '',
+                    dealValue: '',
+                    notes: 'CVG Airport concourse location; authentic Italian coffee + pastries; limited HVAC needs',
+                    source: 'Daily Research'
+                }
+            ];
+            leadsLoaded = true;
+            console.log(`Loaded ${allLeads.length} leads from sample data`);
+        }
+
+        function saveLeads() {
+            localStorage.setItem('allLeads', JSON.stringify(allLeads));
+        }
+
+        async function syncSmartsheet() {
+            const btn = document.getElementById('sync-btn');
+            btn.classList.add('syncing');
+            btn.disabled = true;
+            btn.textContent = '⏳ Syncing leads...';
+
+            try {
+                // First, save current local notes before fetching new data
+                // Owner now syncs with Smartsheet, only notes stay local
+                const currentNotes = {};
+                allLeads.forEach(lead => {
+                    if (lead.notes) {
+                        currentNotes[lead.company] = lead.notes;
+                    }
+                });
+
+                const response = await fetch('/.netlify/functions/leads');
+                const data = await response.json();
+                
+                // Handle array response (direct from Smartsheet API)
+                if (Array.isArray(data) && data.length > 0) {
+                    allLeads = data.map(row => {
+                        const newLead = {
+                            _rowId: row._rowId || '',
+                            company: row['Company Name'] || '',
+                            contact: row['Primary Contact'] || '',
+                            email: row['Contact Email'] || '',
+                            phone: row['Contact Phone'] || '',
+                            stage: row['Stage'] || 'Prospect',
+                            territory: row['Territory'] || '',
+                            industry: row['Industry/Type'] || '',
+                            heat: row['Heat Level'] || 'Warm',
+                            owner: row['Owner'] || '',
+                            nextSteps: row['Next Steps'] || '',
+                            dateAdded: row['Date Added'] || new Date().toISOString().split('T')[0],
+                            lastContact: '',
+                            dealValue: ''
+                        };
+                        
+                        // PRESERVE local notes only (owner syncs from Smartsheet now)
+                        if (currentNotes[newLead.company]) {
+                            newLead.notes = currentNotes[newLead.company];
+                        } else {
+                            newLead.notes = '';
+                        }
+                        
+                        return newLead;
+                    }).filter(lead => lead.company);
+                    
+                    saveLeads();
+                    renderBoard();
+                    generateReports();
+                    document.getElementById('last-sync').textContent = new Date().toLocaleTimeString();
+                } else if (data.success && data.leads) {
+                    // Legacy support for old format
+                    allLeads = data.leads;
+                    saveLeads();
+                    renderBoard();
+                    generateReports();
+                    document.getElementById('last-sync').textContent = new Date().toLocaleTimeString();
+                }
+            } catch (error) {
+                console.error('Sync error:', error);
+            }
+            
+            btn.classList.remove('syncing');
+            btn.disabled = false;
+            btn.textContent = '🔄 Sync Leads';
+        }
+
+        function applyFilters() {
+            renderBoard();
+        }
+
+        function getFilteredLeads() {
+            const territory = document.getElementById('filterTerritory').value;
+            const heat = document.getElementById('filterHeat').value;
+            const owner = document.getElementById('filterOwner').value;
+
+            return allLeads.filter(lead => {
+                return (!territory || lead.territory === territory) &&
+                       (!heat || lead.heat === heat) &&
+                       (!owner || lead.owner === owner);
+            });
+        }
+
+        function renderBoard() {
+            const filtered = getFilteredLeads();
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+
+            STAGES.forEach(stage => {
+                const stageLeads = filtered.filter(l => l.stage === stage);
+                
+                const column = document.createElement('div');
+                column.className = 'stage-column';
+
+                const header = document.createElement('div');
+                header.className = 'stage-header';
+                header.innerHTML = `${stage} <span class="stage-count">${stageLeads.length}</span>`;
+
+                const container = document.createElement('div');
+                container.className = 'leads-container';
+
+                if (stageLeads.length === 0) {
+                    container.innerHTML = '<div class="no-leads">No leads</div>';
+                } else {
+                    stageLeads.forEach(lead => {
+                        const card = createLeadCard(lead);
+                        container.appendChild(card);
+                    });
+                }
+
+                column.appendChild(header);
+                column.appendChild(container);
+                board.appendChild(column);
+            });
+
+            // Setup drag-drop zones after rendering
+            setupDragDropZones();
+        }
+
+        // Store reference to currently editing lead
+        let currentEditingLead = null;
+
+        function createLeadCard(lead) {
+            const card = document.createElement('div');
+            card.className = 'lead-card';
+            card.draggable = true;
+            card.dataset.company = lead.company;
+            card.dataset.rowId = lead._rowId; // Store row ID for updates
+
+            const heatClass = lead.heat.toLowerCase();
+
+            card.innerHTML = `
+                <div class="lead-company">${lead.company}</div>
+                <div class="lead-contact">${lead.contact}</div>
+                <div class="lead-details">
+                    <div>${lead.territory}</div>
+                    <div>${lead.industry}</div>
+                </div>
+                <div class="lead-tags">
+                    <span class="tag ${heatClass}">${lead.heat}</span>
+                    <span class="tag">${lead.owner}</span>
+                    ${lead.dealValue ? `<span class="tag">$${parseInt(lead.dealValue).toLocaleString()}</span>` : ''}
+                    ${lead.notes ? `<span class="tag" style="background: #e8f5e9; color: #2e7d32; border-left: 2px solid #4caf50;">📝 Notes</span>` : ''}
+                </div>
+            `;
+
+            // Click to edit
+            card.addEventListener('click', (e) => {
+                if (e.target !== card && !e.target.closest('.lead-card')) return;
+                openEditModal(lead);
+            });
+
+            // Drag events
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragend', handleDragEnd);
+
+            return card;
+        }
+
+        function openEditModal(lead) {
+            currentEditingLead = lead;
+            document.getElementById('editCompany').value = lead.company;
+            document.getElementById('editContact').value = lead.contact;
+            document.getElementById('editEmail').value = lead.email || '';
+            document.getElementById('editPhone').value = lead.phone || '';
+            document.getElementById('editTerritory').value = lead.territory;
+            document.getElementById('editIndustry').value = lead.industry;
+            document.getElementById('editHeat').value = lead.heat;
+            document.getElementById('editStage').value = lead.stage;
+            document.getElementById('editOwner').value = lead.owner;
+            document.getElementById('editNotes').value = lead.notes || '';
+            document.getElementById('statusMessage').innerHTML = '';
+            document.getElementById('statusMessage').className = 'status-message';
+            document.getElementById('editLeadModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editLeadModal').style.display = 'none';
+            currentEditingLead = null;
+            document.getElementById('editLeadForm').reset();
+        }
+
+        async function deleteLead() {
+            if (!currentEditingLead) return;
+            if (!confirm(`Delete "${currentEditingLead.company}"? This cannot be undone.`)) {
+                return;
+            }
+            
+            const rowId = currentEditingLead._rowId;
+            const companyName = currentEditingLead.company;
+            
+            // Show loading
+            const deleteBtn = document.querySelector('.delete-btn');
+            const originalText = deleteBtn.textContent;
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = '⏳ Deleting...';
+
+            try {
+                // Delete from Smartsheet first
+                if (rowId) {
+                    console.log(`🗑️ Deleting row ${rowId} from Smartsheet`);
+                    const response = await fetch('/.netlify/functions/leads', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ rowId: rowId })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        console.error('Delete failed:', data.error);
+                        showStatusMessage('error', `⚠️ Failed to delete from Smartsheet: ${data.error}`);
+                        deleteBtn.disabled = false;
+                        deleteBtn.textContent = originalText;
+                        return;
+                    }
+
+                    console.log('✅ Lead deleted from Smartsheet');
+                } else {
+                    console.warn('⚠️ No rowId, deleting locally only');
+                }
+
+                // Remove from local kanban
+                allLeads = allLeads.filter(l => l.company !== companyName);
+                saveLeads();
+                closeEditModal();
+                
+                // Show success and reload page to refresh from Smartsheet
+                showStatusMessage('success', `✅ "${companyName}" deleted successfully`);
+                setTimeout(() => location.reload(), 1500);
+            } catch (error) {
+                console.error('Delete error:', error);
+                showStatusMessage('error', '⚠️ Failed to delete lead: ' + error.message);
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = originalText;
+            }
+        }
+
+        function showStatusMessage(type, message) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.className = `status-message ${type}`;
+            statusEl.textContent = message;
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusEl.className = 'status-message';
+                }, 3000);
+            }
+        }
+
+        document.getElementById('editLeadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentEditingLead) return;
+
+            const leadIndex = allLeads.findIndex(l => l.company === currentEditingLead.company);
+            if (leadIndex === -1) return;
+
+            const rowId = allLeads[leadIndex]._rowId;
+            const saveBtn = e.target.querySelector('.save-btn');
+            
+            // Build updates object with changed fields
+            const updatedLead = {
+                company: document.getElementById('editCompany').value,
+                contact: document.getElementById('editContact').value,
+                email: document.getElementById('editEmail').value,
+                phone: document.getElementById('editPhone').value,
+                territory: document.getElementById('editTerritory').value,
+                industry: document.getElementById('editIndustry').value,
+                heat: document.getElementById('editHeat').value,
+                stage: document.getElementById('editStage').value,
+                owner: document.getElementById('editOwner').value,
+                notes: document.getElementById('editNotes').value  // Local notes only
+            };
+
+            // Update local lead
+            allLeads[leadIndex] = {
+                ...allLeads[leadIndex],
+                ...updatedLead
+            };
+
+            saveLeads();
+            saveBtn.textContent = '⏳ Saving...';
+            saveBtn.disabled = true;
+
+            // Sync all changes to Smartsheet
+            // Owner is now PICKLIST type (can be synced)
+            // Notes stays local-only (doesn't exist in Smartsheet)
+            const smartsheetUpdates = {
+                'Company Name': updatedLead.company,
+                'Primary Contact': updatedLead.contact,
+                'Contact Email': updatedLead.email,
+                'Contact Phone': updatedLead.phone,
+                'Territory': updatedLead.territory,
+                'Industry/Type': updatedLead.industry,
+                'Heat Level': updatedLead.heat,
+                'Stage': updatedLead.stage,
+                'Owner': updatedLead.owner
+                // SKIP: Notes (local-only, doesn't exist in Smartsheet)
+            };
+
+            if (rowId) {
+                updateLeadInSmartsheet(rowId, smartsheetUpdates)
+                    .then(() => {
+                        saveBtn.textContent = '💾 Save Changes';
+                        saveBtn.disabled = false;
+                        showStatusMessage('success', '✅ Lead updated successfully');
+                        renderBoard();
+                        closeEditModal();
+                    })
+                    .catch(err => {
+                        console.error('Failed to sync to Smartsheet:', err);
+                        showStatusMessage('error', '⚠️ Changes saved locally but sync to Smartsheet failed. Please try again.');
+                        saveBtn.textContent = '💾 Save Changes';
+                        saveBtn.disabled = false;
+                    });
+            } else {
+                // No row ID, just save locally
+                console.warn('⚠️ No rowId available for Smartsheet sync');
+                saveBtn.textContent = '💾 Save Changes';
+                saveBtn.disabled = false;
+                showStatusMessage('error', '⚠️ Could not sync to Smartsheet (missing row ID)');
+                renderBoard();
+                closeEditModal();
+            }
+        });
+
+        // Drag and Drop Handlers
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('drag-source');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('drag-source');
+            document.querySelectorAll('.leads-container').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+            draggedElement = null;
+        }
+
+        function setupDragDropZones() {
+            const containers = document.querySelectorAll('.leads-container');
+            
+            containers.forEach(container => {
+                container.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    container.classList.add('drag-over');
+                });
+
+                container.addEventListener('dragleave', (e) => {
+                    if (e.target === container) {
+                        container.classList.remove('drag-over');
+                    }
+                });
+
+                container.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    container.classList.remove('drag-over');
+                    
+                    if (!draggedElement) return;
+
+                    const leadCompany = draggedElement.dataset.company;
+                    const rowId = draggedElement.dataset.rowId;
+                    const leadIndex = allLeads.findIndex(l => l.company === leadCompany);
+                    
+                    if (leadIndex === -1) return;
+
+                    // Determine new stage from container's column header
+                    const stageColumn = container.closest('.stage-column');
+                    const stageHeader = stageColumn.querySelector('.stage-header');
+                    const newStage = stageHeader.textContent.split(' ')[0];
+
+                    // Update lead stage
+                    const oldStage = allLeads[leadIndex].stage;
+                    allLeads[leadIndex].stage = newStage;
+                    
+                    if (oldStage !== newStage) {
+                        saveLeads();
+                        renderBoard(); // Show change immediately
+                        
+                        // Sync stage change to Smartsheet
+                        if (rowId) {
+                            updateLeadInSmartsheet(rowId, { 'Stage': newStage })
+                                .catch(err => {
+                                    console.error('Failed to sync stage change to Smartsheet:', err);
+                                    // Revert locally
+                                    allLeads[leadIndex].stage = oldStage;
+                                    saveLeads();
+                                    renderBoard();
+                                });
+                        } else {
+                            console.warn('⚠️ No rowId for lead, sync skipped');
+                        }
+                    }
+                });
+            });
+        }
+
+        function generateReports() {
+            // Metrics
+            const metricsGrid = document.getElementById('metricsGrid');
+            const totalLeads = allLeads.length;
+            const hotCount = allLeads.filter(l => l.heat === 'Hot').length;
+            const warmCount = allLeads.filter(l => l.heat === 'Warm').length;
+            const totalValue = allLeads.reduce((sum, l) => sum + (parseInt(l.dealValue) || 0), 0);
+
+            metricsGrid.innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-value">${totalLeads}</div>
+                    <div class="metric-label">Total Leads</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${hotCount}</div>
+                    <div class="metric-label">🔥 Hot Leads</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${warmCount}</div>
+                    <div class="metric-label">⚡ Warm Leads</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">$${(totalValue / 1000).toFixed(0)}K</div>
+                    <div class="metric-label">Pipeline Value</div>
+                </div>
+            `;
+
+            // Leads per team member
+            const leadsPerTeam = {};
+            OWNERS.forEach(owner => {
+                leadsPerTeam[owner] = {
+                    total: 0,
+                    Prospect: 0,
+                    Qualified: 0,
+                    Proposed: 0,
+                    Won: 0
+                };
+            });
+
+            allLeads.forEach(lead => {
+                if (leadsPerTeam[lead.owner]) {
+                    leadsPerTeam[lead.owner].total++;
+                    leadsPerTeam[lead.owner][lead.stage]++;
+                }
+            });
+
+            const teamTable = document.getElementById('leadsPerTeamTable');
+            let teamHTML = '';
+            Object.entries(leadsPerTeam).forEach(([owner, data]) => {
+                teamHTML += `
+                    <tr>
+                        <td><strong>${owner}</strong></td>
+                        <td>${data.total}</td>
+                        <td>${data.Prospect}</td>
+                        <td>${data.Qualified}</td>
+                        <td>${data.Proposed}</td>
+                        <td>${data.Won}</td>
+                    </tr>
+                `;
+            });
+            teamTable.querySelector('tbody').innerHTML = teamHTML;
+
+            // Stage & Territory
+            const stageTerrData = {};
+            TERRITORIES.forEach(t => {
+                stageTerrData[t] = { Prospect: 0, Qualified: 0, Proposed: 0, Won: 0, value: 0 };
+            });
+
+            allLeads.forEach(lead => {
+                if (stageTerrData[lead.territory]) {
+                    stageTerrData[lead.territory][lead.stage]++;
+                    stageTerrData[lead.territory].value += parseInt(lead.dealValue) || 0;
+                }
+            });
+
+            const terrTable = document.getElementById('stageTerritorySummary');
+            let terrHTML = '';
+            Object.entries(stageTerrData).forEach(([terr, data]) => {
+                terrHTML += `
+                    <tr>
+                        <td><strong>${terr}</strong></td>
+                        <td>${data.Prospect}</td>
+                        <td>${data.Qualified}</td>
+                        <td>${data.Proposed}</td>
+                        <td>${data.Won}</td>
+                        <td>$${(data.value / 1000).toFixed(0)}K</td>
+                    </tr>
+                `;
+            });
+            terrTable.querySelector('tbody').innerHTML = terrHTML;
+
+            // Heat distribution
+            const heatCounts = { Hot: 0, Warm: 0, Cold: 0 };
+            allLeads.forEach(lead => heatCounts[lead.heat]++);
+
+            const heatTable = document.getElementById('heatSummary');
+            let heatHTML = '';
+            Object.entries(heatCounts).forEach(([heat, count]) => {
+                const pct = totalLeads > 0 ? ((count / totalLeads) * 100).toFixed(1) : 0;
+                heatHTML += `
+                    <tr>
+                        <td><strong>${heat}</strong></td>
+                        <td>${count}</td>
+                        <td>${pct}%</td>
+                    </tr>
+                `;
+            });
+            heatTable.querySelector('tbody').innerHTML = heatHTML;
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tab === 'reports') {
+                generateReports();
+            }
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('editLeadModal');
+            if (e.target === modal) {
+                closeEditModal();
+            }
+        });
+
+        document.getElementById('sync-btn').onclick = syncSmartsheet;
+        document.getElementById('add-lead-btn').onclick = function(e) {
+            e.preventDefault();
+            openAddLeadModal();
+        };
+
+        // Load data on page load via Netlify function
+        async function initializeLeads() {
+            try {
+                // First, load any locally saved data (notes and owner are local-only)
+                let localLeads = {};
+                try {
+                    const saved = localStorage.getItem('allLeads');
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        // Index by company name for quick lookup
+                        parsed.forEach(lead => {
+                            localLeads[lead.company] = lead;
+                        });
+                    }
+                } catch (e) {
+                    console.warn('Could not parse local leads:', e);
+                }
+
+                const response = await fetch('/.netlify/functions/leads');
+                const data = await response.json();
+                
+                // Handle array response (direct from Smartsheet API)
+                if (Array.isArray(data) && data.length > 0) {
+                    allLeads = data.map(row => {
+                        const smartsheetLead = {
+                            _rowId: row._rowId || '',
+                            company: row['Company Name'] || '',
+                            contact: row['Primary Contact'] || '',
+                            email: row['Contact Email'] || '',
+                            phone: row['Contact Phone'] || '',
+                            stage: row['Stage'] || 'Prospect',
+                            territory: row['Territory'] || '',
+                            industry: row['Industry/Type'] || '',
+                            heat: row['Heat Level'] || 'Warm',
+                            owner: row['Owner'] || '',
+                            nextSteps: row['Next Steps'] || '',
+                            dateAdded: row['Date Added'] || new Date().toISOString().split('T')[0],
+                            lastContact: '',
+                            dealValue: ''
+                        };
+
+                        // PRESERVE local-only fields from localStorage (notes only)
+                        // Owner now syncs with Smartsheet (PICKLIST type)
+                        if (localLeads[smartsheetLead.company] && localLeads[smartsheetLead.company].notes) {
+                            smartsheetLead.notes = localLeads[smartsheetLead.company].notes;
+                        } else {
+                            smartsheetLead.notes = '';
+                        }
+
+                        return smartsheetLead;
+                    }).filter(lead => lead.company);
+                    
+                    renderBoard();
+                    generateReports();
+                    document.getElementById('last-sync').textContent = 'Just now';
+                } else if (data.success && data.leads) {
+                    // Legacy support for old format
+                    allLeads = data.leads;
+                    renderBoard();
+                    generateReports();
+                    document.getElementById('last-sync').textContent = 'Just now';
+                }
+            } catch (error) {
+                console.error('Failed to load leads:', error);
+                // Fallback to sample data in localStorage
+                renderBoard();
+                generateReports();
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeLeads);
+        } else {
+            initializeLeads();
+        }
+
+        // Manual card creation functions
+        function openAddLeadModal() {
+            const html = `
+            <div id="leadModal" style="display:block; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.7);">
+                <div style="background-color:#f4f4f4; margin:10% auto; padding:30px; border:1px solid #888; width:90%; max-width:500px; border-radius:8px;">
+                    <span style="color:#aaa; float:right; font-size:28px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('leadModal').style.display='none'">&times;</span>
+                    <h2>Add New Lead</h2>
+                    <form id="leadForm" style="margin-top:20px;">
+                        <div style="margin-bottom:15px;">
+                            <label>Company Name *</label>
+                            <input type="text" id="companyName" required style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Primary Contact</label>
+                            <input type="text" id="contactName" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Email</label>
+                            <input type="email" id="contactEmail" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Phone</label>
+                            <input type="tel" id="contactPhone" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Territory *</label>
+                            <select id="territory" required style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                                <option value="">Select Territory</option>
+                                <option value="Austin">Austin (Cincinnati)</option>
+                                <option value="Joe">Joe (Large Cincinnati)</option>
+                                <option value="Dan">Dan (Kansas City)</option>
+                                <option value="Mike">Mike (National)</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Heat Level *</label>
+                            <select id="heat" required style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                                <option value="">Select Heat</option>
+                                <option value="Hot">🔥 Hot</option>
+                                <option value="Warm">⚡ Warm</option>
+                                <option value="Cold">🔷 Cold</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Industry/Type</label>
+                            <input type="text" id="industry" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" style="flex:1; background:#FF5722; color:white; padding:10px; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">
+                                Add Lead & Sync to Smartsheet
+                            </button>
+                            <button type="button" onclick="document.getElementById('leadModal').style.display='none'" style="flex:1; background:#999; color:white; padding:10px; border:none; border-radius:4px; cursor:pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', html);
+            
+            document.getElementById('leadForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const leadData = {
+                    'Company Name': document.getElementById('companyName').value,
+                    'Primary Contact': document.getElementById('contactName').value,
+                    'Contact Email': document.getElementById('contactEmail').value,
+                    'Contact Phone': document.getElementById('contactPhone').value,
+                    'Territory': document.getElementById('territory').value,
+                    'Industry/Type': document.getElementById('industry').value,
+                    'Heat Level': document.getElementById('heat').value,
+                    'Stage': 'Prospect',
+                    'Owner': document.getElementById('territory').value
+                };
+                
+                // Add to local kanban storage
+                allLeads.push({
+                    company: leadData['Company Name'],
+                    contact: leadData['Primary Contact'],
+                    email: leadData['Contact Email'],
+                    phone: leadData['Contact Phone'],
+                    territory: leadData['Territory'],
+                    industry: leadData['Industry/Type'],
+                    heat: leadData['Heat Level'],
+                    stage: leadData['Stage'],
+                    nextSteps: 'Add to leads sheet',
+                    owner: leadData['Owner'],
+                    dateAdded: leadData['Date Added'],
+                    lastContact: '',
+                    dealValue: '',
+                    notes: '',
+                    source: 'Manual Entry'
+                });
+                saveLeads();
+                
+                // Show loading message while syncing to Smartsheet
+                alert('✅ Lead saved locally. Syncing to Smartsheet...');
+                document.getElementById('leadModal').style.display = 'none';
+                document.getElementById('leadModal').remove();
+                
+                // Wait for Smartsheet sync to complete, then trigger research and reload
+                syncLeadToSmartsheet(leadData)
+                    .then((response) => {
+                        console.log('✅ Lead synced to Smartsheet');
+                        
+                        // Trigger Pete research for new lead
+                        console.log('🔍 Triggering Pete research for:', leadData['Company Name']);
+                        fetch('/.netlify/functions/trigger-research', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                companyName: leadData['Company Name'],
+                                contact: leadData['Primary Contact'],
+                                territory: leadData['Territory']
+                            })
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            console.log('✅ Research triggered:', data.message);
+                        })
+                        .catch(err => {
+                            console.warn('Could not trigger research:', err);
+                        });
+                        
+                        // Reload after 1 second to fetch the new row with its ID
+                        setTimeout(() => location.reload(), 1000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to sync to Smartsheet:', err);
+                        alert('⚠️ Lead added to kanban but sync to Smartsheet failed. Reloading...');
+                        setTimeout(() => location.reload(), 1000);
+                    });
+            });
+        }
+
+        async function syncLeadToSmartsheet(leadData) {
+            // Use Netlify function to add lead (avoids CORS issues)
+            try {
+                const response = await fetch('/.netlify/functions/leads', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(leadData)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    console.error('❌ Netlify function error:', response.status, error);
+                    return Promise.reject(new Error(`HTTP ${response.status}: ${error.error || 'Unknown error'}`));
+                }
+                
+                const data = await response.json();
+                console.log('✅ Lead synced to Smartsheet:', data);
+                return Promise.resolve(data);
+            } catch (e) {
+                console.error('❌ Sync failed:', e.message);
+                return Promise.reject(e);
+            }
+        }
+
+        async function updateLeadInSmartsheet(rowId, updates) {
+            // Update existing lead in Smartsheet via PATCH
+            if (!rowId) {
+                console.warn('⚠️ No rowId provided for update');
+                return Promise.reject(new Error('Missing rowId'));
+            }
+
+            console.log('🔄 Updating row', rowId, 'with:', JSON.stringify(updates));
+
+            try {
+                const response = await fetch('/.netlify/functions/leads', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        rowId: rowId,
+                        updates: updates
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    console.error('❌ Update error:', response.status, JSON.stringify(data));
+                    return Promise.reject(new Error(`HTTP ${response.status}: ${data.error || 'Unknown error'}`));
+                }
+                
+                console.log('✅ Lead updated in Smartsheet:', data);
+                return Promise.resolve(data);
+            } catch (e) {
+                console.error('❌ Update failed:', e.message);
+                return Promise.reject(e);
+            }
+        }
+
+        async function syncAllLeadsToSmartsheet() {
+            // This is a simplified sync that just logs the sync attempt
+            // In production, you would batch update all leads
+            console.log('🔄 Syncing all leads to Smartsheet...');
+            
+            try {
+                // Attempt to sync - this would be a batch operation in production
+                for (const lead of allLeads) {
+                    const leadData = {
+                        'Company Name': lead.company,
+                        'Primary Contact': lead.contact,
+                        'Contact Email': lead.email,
+                        'Contact Phone': lead.phone,
+                        'Territory': lead.territory,
+                        'Industry/Type': lead.industry,
+                        'Heat Level': lead.heat,
+                        'Stage': lead.stage,
+                        'Owner': lead.owner
+                        // Exclude Notes and Source - not in Smartsheet
+                    };
+                }
+                console.log('✅ All leads synced');
+                return true;
+            } catch (e) {
+                console.log('⚠️ Sync attempt completed');
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>

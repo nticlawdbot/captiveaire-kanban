@@ -1,0 +1,12 @@
+[build]
+command = "echo 'No build needed'"
+functions = "functions"
+publish = "."
+
+[dev]
+functions = "functions"
+
+[context.production.environment]
+SMARTSHEET_API_TOKEN = "6Q82Fjy1NKLHhEufhHshTSi5gje1EfmtgXK0D"
+LEADS_SHEET_ID = "3616288321523588"
+PROJECTS_SHEET_ID = "6669466080700292"
